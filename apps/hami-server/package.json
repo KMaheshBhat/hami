@@ -1,0 +1,20 @@
+{
+  "name": "@hami/hami-server",
+  "version": "1.0.0",
+  "description": "Hami HTTP server application",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "bunx tsc",
+    "dev": "bun run build && bun run dist/index.js",
+    "start": "bun run dist/index.js"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@hami/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

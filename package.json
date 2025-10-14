@@ -1,0 +1,18 @@
+{
+  "name": "hami-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "cli:dev": "bun run --cwd apps/hami-cli dev",
+    "server:dev": "bun run --cwd apps/hami-server dev",
+    "all:build": "bun run --filter=\"@hami/core*\" build && bun run --filter=\"@hami/hami-*\" build",
+    "all:clean": "rm -rf apps/*/dist packages/*/dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
