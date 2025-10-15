@@ -1,5 +1,6 @@
 import { homedir } from 'os';
 import { join as pathJoin } from 'path';
+import { Node } from 'pocketflow';
 
 export function startContext(): Record<string, any> {
   let userHomeDirectory = homedir();
@@ -10,4 +11,12 @@ export function startContext(): Record<string, any> {
     userHamiDirectory: pathJoin(userHomeDirectory, '.hami')
   }
   return context;
+}
+
+export class ValidateErrorHandlerNode extends Node {
+  async prep(shared: Record<string, any>): Promise<void> {
+    console.log('Validation failed.');
+    console.log('errors:', shared.directoryValidationErrors);
+    return;
+  }
 }

@@ -1,0 +1,20 @@
+{
+  "name": "@hami/core-trace-fs",
+  "version": "1.0.0",
+  "description": "Trace logging library for Hami",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "bunx tsc",
+    "dev": "bun run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@hami/core": "workspace:*",
+    "uuidv7": "^1.0.2"
+  }
+}

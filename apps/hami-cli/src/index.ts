@@ -4,6 +4,7 @@ import { Command } from 'commander';
 import packageJson from '../package.json' with { type: 'json' };
 import { handleInit } from './cmd/init.js';
 import { handleGet, handleGetAll, handleSet, handleRemove } from './cmd/config.js';
+import { handleTraceList, handleTraceShow, handleTraceGrep } from './cmd/trace.js';
 import { config } from 'process';
 
 const program = new Command();
@@ -86,5 +87,53 @@ let cmdConfig = new Command('config')
     }
   });
 program.addCommand(cmdConfig);
+
+let cmdTrace = new Command('trace')
+  .description('Inspect operation history and traces')
+  .addCommand(
+    new Command('list')
+      .description('List all operations in the workflow index')
+      .action(async () => {
+        try {
+          const isVerbose = !!program.opts().verbose;
+          const opts = { verbose: isVerbose };
+          await handleTraceList(opts);
+        } catch (error) {
+          console.log('Error handling trace list command:', error);
+          process.exit(1);
+        }
+      }),
+  )
+  .addCommand(
+    new Command('show')
+      .description('Show details of a specific trace')
+      .argument('<traceId>', 'Trace ID to show')
+      .action(async (traceId: string) => {
+        try {
+          const isVerbose = !!program.opts().verbose;
+          const opts = { verbose: isVerbose };
+          await handleTraceShow(opts, traceId);
+        } catch (error) {
+          console.log('Error handling trace show command:', error);
+          process.exit(1);
+        }
+      }),
+  )
+  .addCommand(
+    new Command('grep')
+      .description('Search traces for a query string')
+      .argument('<query>', 'Search query to match in traces')
+      .action(async (query: string) => {
+        try {
+          const isVerbose = !!program.opts().verbose;
+          const opts = { verbose: isVerbose };
+          await handleTraceGrep(opts, query);
+        } catch (error) {
+          console.log('Error handling trace grep command:', error);
+          process.exit(1);
+        }
+      }),
+  );
+program.addCommand(cmdTrace);
 
 program.parse();

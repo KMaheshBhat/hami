@@ -17,6 +17,7 @@
         "@hami/core": "workspace:*",
         "@hami/core-config-fs": "workspace:*",
         "@hami/core-fs": "workspace:*",
+        "@hami/core-trace-fs": "workspace:*",
         "commander": "^12.0.0",
         "pocketflow": "^1.0.4",
       },
@@ -70,6 +71,18 @@
         "typescript": "^5.0.0",
       },
     },
+    "packages/core-trace-fs": {
+      "name": "@hami/core-trace-fs",
+      "version": "1.0.0",
+      "dependencies": {
+        "@hami/core": "workspace:*",
+        "uuidv7": "^1.0.2",
+      },
+      "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0",
+      },
+    },
   },
   "packages": {
     "@hami/core": ["@hami/core@workspace:packages/core"],
@@ -77,6 +90,8 @@
     "@hami/core-config-fs": ["@hami/core-config-fs@workspace:packages/core-config-fs"],
 
     "@hami/core-fs": ["@hami/core-fs@workspace:packages/core-fs"],
+
+    "@hami/core-trace-fs": ["@hami/core-trace-fs@workspace:packages/core-trace-fs"],
 
     "@hami/hami-cli": ["@hami/hami-cli@workspace:apps/hami-cli"],
 
@@ -93,5 +108,7 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "undici-types": ["undici-types@6.21.0", "", {}, "sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ=="],
+
+    "uuidv7": ["uuidv7@1.0.2", "", { "bin": { "uuidv7": "cli.js" } }, "sha512-8JQkH4ooXnm1JCIhqTMbtmdnYEn6oKukBxHn1Ic9878jMkL7daTI7anTExfY18VRCX7tcdn5quzvCb6EWrR8PA=="],
   }
 }

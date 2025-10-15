@@ -1,9 +1,10 @@
-import { Flow, Node } from "pocketflow";
+import { Flow } from "pocketflow";
 
-import { CoreConfigFSGetAllNode, CoreConfigFSGetNode, CoreConfigFSSetNode, CoreConfigFSRemoveNode } from "@hami/core-config-fs";
+import { CoreConfigFSGetAllNode, CoreConfigFSGetNode, CoreConfigFSRemoveNode, CoreConfigFSSetNode } from "@hami/core-config-fs";
 import { ValidateNode } from "@hami/core-fs";
+import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
 
-import { startContext } from "./common.js";
+import { startContext, ValidateErrorHandlerNode } from "./common.js";
 
 export async function handleGetAll(
     opts: Record<string, any>,
@@ -55,9 +56,18 @@ export async function handleSet(
 ) {
     const validateWorkingDirectory = new ValidateNode();
     const validateErrorHandler = new ValidateErrorHandlerNode();
+    const traceDataInject = new CoreTraceFSInjectNode({
+        executor: 'cli',
+        command: 'config',
+        operation: 'set',
+        target: inPayload.target,
+        key: inPayload.configKey,
+        value: inPayload.configValue,
+    });
     const coreConfigFSSet = new CoreConfigFSSetNode();
+    const coreTraceFSLog = new CoreTraceFSLogNode();
     validateWorkingDirectory.on('error', validateErrorHandler);
-    validateWorkingDirectory.next(coreConfigFSSet);
+    validateWorkingDirectory.next(traceDataInject).next(coreConfigFSSet).next(coreTraceFSLog);
     const shared: Record<string, any> = {
         coreFSStrategy: 'CWD',
         opts: opts,
@@ -74,9 +84,17 @@ export async function handleRemove(
 ) {
     const validateWorkingDirectory = new ValidateNode();
     const validateErrorHandler = new ValidateErrorHandlerNode();
+    const traceDataInject = new CoreTraceFSInjectNode({
+        executor: 'cli',
+        command: 'config',
+        operation: 'remove',
+        target: inPayload.target,
+        key: inPayload.configKey,
+    });
     const coreConfigFSRemove = new CoreConfigFSRemoveNode();
+    const coreTraceFSLog = new CoreTraceFSLogNode();
     validateWorkingDirectory.on('error', validateErrorHandler);
-    validateWorkingDirectory.next(coreConfigFSRemove);
+    validateWorkingDirectory.next(traceDataInject).next(coreConfigFSRemove).next(coreTraceFSLog);
     const shared: Record<string, any> = {
         coreFSStrategy: 'CWD',
         opts: opts,
@@ -85,12 +103,4 @@ export async function handleRemove(
     };
     const removeFlow = new Flow(validateWorkingDirectory);
     await removeFlow.run(shared);
-}
-
-class ValidateErrorHandlerNode extends Node {
-    async prep(shared: Record<string, any>): Promise<void> {
-        console.log('Validation failed.');
-        console.log('errors:', shared.directoryValidationErrors);
-        return;
-    }
 }
