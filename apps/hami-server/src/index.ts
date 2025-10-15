@@ -1,10 +1,9 @@
 import { Hono } from 'hono';
-import { greet } from '@hami/core';
 
 const app = new Hono();
 
 app.get('/', (c) => {
-  return c.text(greet('Hami Server'));
+  return c.text('Hami Server');
 });
 
 app.get('/health', (c) => {

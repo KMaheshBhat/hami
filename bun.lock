@@ -11,11 +11,14 @@
       "name": "@hami/hami-cli",
       "version": "1.0.0",
       "bin": {
-        "hami-cli": "dist/index.js",
+        "hami": "dist/index.js",
       },
       "dependencies": {
         "@hami/core": "workspace:*",
+        "@hami/core-config-fs": "workspace:*",
+        "@hami/core-fs": "workspace:*",
         "commander": "^12.0.0",
+        "pocketflow": "^1.0.4",
       },
       "devDependencies": {
         "@types/node": "^20.0.0",
@@ -37,16 +40,30 @@
     "packages/core": {
       "name": "@hami/core",
       "version": "1.0.0",
+      "dependencies": {
+        "pocketflow": "^1.0.4",
+      },
       "devDependencies": {
         "@types/node": "^20.0.0",
         "typescript": "^5.0.0",
       },
     },
-    "packages/core-config": {
-      "name": "@hami/core-config",
+    "packages/core-config-fs": {
+      "name": "@hami/core-config-fs",
       "version": "1.0.0",
       "dependencies": {
-        "pocketflow": "^1.0.4",
+        "@hami/core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0",
+      },
+    },
+    "packages/core-fs": {
+      "name": "@hami/core-fs",
+      "version": "1.0.0",
+      "dependencies": {
+        "@hami/core": "workspace:*",
       },
       "devDependencies": {
         "@types/node": "^20.0.0",
@@ -57,7 +74,9 @@
   "packages": {
     "@hami/core": ["@hami/core@workspace:packages/core"],
 
-    "@hami/core-config": ["@hami/core-config@workspace:packages/core-config"],
+    "@hami/core-config-fs": ["@hami/core-config-fs@workspace:packages/core-config-fs"],
+
+    "@hami/core-fs": ["@hami/core-fs@workspace:packages/core-fs"],
 
     "@hami/hami-cli": ["@hami/hami-cli@workspace:apps/hami-cli"],
 

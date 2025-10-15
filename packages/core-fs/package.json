@@ -1,7 +1,7 @@
 {
-  "name": "@hami/core-config",
+  "name": "@hami/core-fs",
   "version": "1.0.0",
-  "description": "Configuration library for Hami",
+  "description": "File system utilities for Hami",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,6 +14,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "pocketflow": "^1.0.4"
+    "@hami/core": "workspace:*"
   }
 }

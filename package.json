@@ -8,8 +8,9 @@
   ],
   "scripts": {
     "cli:dev": "bun run --cwd apps/hami-cli dev",
+    "cli:install": "bun run --cwd apps/hami-cli build && cd apps/hami-cli && npm install -g .",
     "server:dev": "bun run --cwd apps/hami-server dev",
-    "all:build": "bun run --filter=\"@hami/core*\" build && bun run --filter=\"@hami/hami-*\" build",
+    "all:build": "bun run --filter=\"@hami/core\" build && bun run --filter=\"@hami/core-*\" build && bun run --filter=\"@hami/hami-*\" build",
     "all:clean": "rm -rf apps/*/dist packages/*/dist"
   },
   "devDependencies": {
