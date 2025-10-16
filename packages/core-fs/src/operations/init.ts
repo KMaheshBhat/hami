@@ -4,9 +4,23 @@ import { promises as fs } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 
-import { HAMINode } from '@hami/core';
+import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami/core';
 
 import { CoreFSOpts, CoreFSSharedStorage } from '../types.js';
+
+type InitWorkingDirectoryNodeConfig = {
+  strategy?: string;
+};
+
+const InitWorkingDirectoryNodeConfigSchema : ValidationSchema = {
+  type: 'object',
+  properties: {
+    strategy: {
+      type: 'string',
+      enum: ['CWD'],
+    },
+  },
+};
 
 type InitWorkingDirectoryNodeInput = {
   targetDirectory?: string;
@@ -20,16 +34,25 @@ type InitWorkingDirectoryNodeOutput = {
   userHamiDirectory?: string;
 };
 
-class InitWorkingDirectoryNode extends HAMINode<CoreFSSharedStorage> {
+class InitWorkingDirectoryNode extends HAMINode<CoreFSSharedStorage, InitWorkingDirectoryNodeConfig> {
   kind(): string {
     return "core-fs:init-hami";
+  }
+
+  validateConfig(config: InitWorkingDirectoryNodeConfig): HAMINodeConfigValidateResult {
+    const result = validateAgainstSchema(config, InitWorkingDirectoryNodeConfigSchema);
+    return {
+      valid: result.isValid,
+      errors: result.errors || [],
+    };
   }
 
   async prep(
     shared: CoreFSSharedStorage,
   ): Promise<InitWorkingDirectoryNodeInput> {
     let workingDir;
-    switch (shared.coreFSStrategy) {
+    let strategy = this.config?.strategy || shared.coreFSStrategy;
+    switch (strategy) {
       case 'CWD':
         workingDir = process.cwd();
         break;

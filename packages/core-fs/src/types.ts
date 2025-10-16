@@ -14,6 +14,9 @@ type CoreFSSharedStorage = {
   userHomeDirectory?: string;
   userHamiDirectory?: string;
   directoryValidationErrors?: string[];
+  copySourcePattern?: string;
+  copyTargetDirectory?: string;
+  copyResults?: string[];
 };
 
 export {

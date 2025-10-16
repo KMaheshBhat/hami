@@ -6,7 +6,9 @@ import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
 export async function handleInit(
     opts: Record<string, any>,
 ) {
-    const initWorkingDirectory = new InitWorkingDirectoryNode();
+    const initWorkingDirectory = new InitWorkingDirectoryNode({
+        strategy: 'CWD',
+    });
     const traceDataInject = new CoreTraceFSInjectNode({
         executor: 'cli',
         command: 'init',
@@ -17,7 +19,6 @@ export async function handleInit(
         .next(coreTraceFSLog);
     const initFlow = new Flow(initWorkingDirectory);
     await initFlow.run({
-        coreFSStrategy: 'CWD',
         opts: opts as CoreFSOpts,
     });
 }
