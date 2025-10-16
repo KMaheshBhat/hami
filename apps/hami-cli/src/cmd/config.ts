@@ -4,7 +4,7 @@ import { HAMIRegistrationManager } from "@hami/core";
 
 import { startContext, ValidateErrorHandlerNode } from "./common.js";
 
-export async function handleGetAll(
+export async function handleConfigList(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
@@ -27,7 +27,7 @@ export async function handleGetAll(
     }
 }
 
-export async function handleGet(
+export async function handleConfigGet(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
@@ -50,7 +50,7 @@ export async function handleGet(
     }
 }
 
-export async function handleSet(
+export async function handleConfigSet(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
@@ -79,12 +79,12 @@ export async function handleSet(
     await setFlow.run(shared);
 }
 
-export async function handleRemove(
+export async function handleConfigRemove(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
-    const validateWorkingDirectory = registry.createNode("core-fs:validate", {});
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
     const traceDataInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
