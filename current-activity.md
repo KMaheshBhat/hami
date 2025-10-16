@@ -31,10 +31,13 @@ From the provided code, the old system had:
 ## New PocketFlow Integration
 
 ### Current State
-The new project has minimal PocketFlow integration:
-- `HAMINode` class extends PocketFlow's `Node` class
-- Basic kind() method returning "hami-node"
-- No provider registration system yet
+The new project has significant progress on PocketFlow integration:
+- `HAMINode` abstract class extends PocketFlow's `Node` with configuration and validation
+- `HAMIFlow` abstract class extends PocketFlow's `Flow` with configuration and validation
+- Two concrete nodes implemented: `CoreFSCopyNode` and `InitWorkingDirectoryNode`
+- Schema-based validation system with `ValidationSchema` and `validateAgainstSchema`
+- Nodes are configurable and validated at construction time
+- No plugin registration system yet (this is the pending work)
 
 ### PocketFlow Concepts
 PocketFlow provides:
@@ -46,18 +49,24 @@ PocketFlow provides:
 ## High-Level Approach for Provider Registration
 
 ### 1. HAMINode as Abstract Provider
-Make HAMINode the provider contract:
+HAMINode is already the provider contract with configuration and validation:
 
 ```typescript
-abstract class HAMINode<S = unknown> extends Node<S> {
-  // From PocketFlow Node
-  abstract kind(): string;
+abstract class HAMINode<S = unknown, C = unknown> extends Node<S> {
+  protected config: C | undefined = undefined;
 
-  // Provider contract
-  static description: string;
-  static create(config: NodeConfig): HAMINode;
-  static validateConfig?(config: NodeConfig): ValidationResult;
-  static isFlow?: boolean; // distinguish flow nodes
+  constructor(config: C | undefined = undefined, maxRetries: number = 1, wait: number = 0) {
+    super(maxRetries, wait);
+    this.config = config;
+    if (!config) return;
+    const validation = this.validateConfig(config);
+    if (!validation.valid) {
+      throw new Error(`Invalid configuration for HAMINode ${this.kind()}`);
+    }
+  }
+
+  abstract kind(): string;
+  validateConfig(_config: C): HAMINodeConfigValidateResult;
 }
 ```
 
@@ -65,7 +74,7 @@ abstract class HAMINode<S = unknown> extends Node<S> {
 Registration manager works with HAMINode classes:
 
 ```typescript
-class PocketFlowRegistrationManager {
+class HAMIRegistrationManager {
   private nodeClasses = new Map<string, typeof HAMINode>();
 
   registerNodeClass(nodeClass: typeof HAMINode): void;
@@ -81,7 +90,7 @@ class PocketFlowRegistrationManager {
 Plugins provide HAMINode classes directly:
 
 ```typescript
-interface PocketFlowPlugin {
+interface HAMIPlugin {
   name: string;
   version: string;
   initialize(): Promise<void>;
@@ -95,7 +104,7 @@ Factory functions create HAMINode subclasses:
 
 ```typescript
 function createHAMINodeClass(config: HAMINodeConfig): typeof HAMINode;
-function createHAMIFlowClass(config: HAMIFlowConfig): typeof HAMINode;
+function createHAMIFlowClass(config: HAMIFlowConfig): typeof HAMIFlow;
 ```
 
 ### 5. Category Organization
@@ -106,28 +115,29 @@ Maintain hierarchical organization:
 
 ## Implementation Plan
 
-### Phase 1: Core Types and Interfaces
-1. Convert HAMINode to abstract class with provider contract
-2. Add static factory methods and validation to HAMINode
-3. Create validation schemas for configurations
+### Phase 1: Core Types and Interfaces ✅ COMPLETED
+1. HAMINode abstract class with configuration and validation ✅
+2. HAMIFlow abstract class with configuration and validation ✅
+3. Validation schemas and validateAgainstSchema function ✅
+4. Two concrete nodes: CoreFSCopyNode and InitWorkingDirectoryNode ✅
 
-### Phase 2: Registration System
-1. Create `PocketFlowRegistrationManager` class
+### Phase 2: Plugin Management System ⏳ PENDING (Current Focus)
+1. Create `HAMIRegistrationManager` class
 2. Implement registration methods for HAMINode classes
 3. Add category-based querying and organization
-4. Support flow vs node distinction via static `isFlow` property
+4. Support flow vs node distinction via static properties
 
-### Phase 3: Plugin Architecture
-1. Define `PocketFlowPlugin` interface
+### Phase 3: Plugin Architecture ⏳ PENDING
+1. Define `HAMIPlugin` interface
 2. Implement plugin loading and initialization
 3. Add lifecycle management for plugins
 
-### Phase 4: Integration with PocketFlow
+### Phase 4: Integration with PocketFlow ⏳ PENDING
 1. RegistrationManager creates HAMINode instances from registered classes
 2. Create flow composition utilities using HAMINode classes
 3. Add validation and error handling
 
-### Phase 5: Testing and Documentation
+### Phase 5: Testing and Documentation ⏳ PENDING
 1. Create comprehensive tests for provider registration
 2. Document provider creation patterns and best practices
 3. Add examples and usage guides
@@ -186,8 +196,10 @@ HAMINode (abstract class)
 
 ## Next Steps
 
-1. Implement core provider interfaces
-2. Create registration manager
-3. Develop plugin system
-4. Test with sample providers
-5. Document usage patterns
+1. ✅ **Phase 1 Complete**: HAMINode/HAMIFlow abstractions with validation
+2. ⏳ **Phase 2 Current**: Implement plugin management system (PocketFlowRegistrationManager)
+3. ⏳ **Phase 3 Pending**: Plugin architecture and loading
+4. ⏳ **Phase 4 Pending**: PocketFlow integration utilities
+5. ⏳ **Phase 5 Pending**: Testing and documentation
+
+**Current Focus**: Plugin management system - the HAMIRegistrationManager that will allow dynamic loading and instantiation of HAMINode classes. Only HAMI-wrapped nodes/flows with `kind()` methods can be registered, not native PocketFlow nodes.
