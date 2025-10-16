@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import packageJson from '../package.json' with { type: 'json' };
-import { handleInit } from './cmd/init.js';
-import { handleGet, handleGetAll, handleSet, handleRemove } from './cmd/config.js';
-import { handleTraceList, handleTraceShow, handleTraceGrep } from './cmd/trace.js';
-import { config } from 'process';
 
+import packageJson from '../package.json' with { type: 'json' };
+import { bootstrap } from './bootstrap.js';
+import { handleGet, handleGetAll, handleRemove, handleSet } from './cmd/config.js';
+import { handleInit } from './cmd/init.js';
+import { handleTraceGrep, handleTraceList, handleTraceShow } from './cmd/trace.js';
+
+const { registry } = await bootstrap();
 const program = new Command();
 
 program
@@ -19,7 +21,7 @@ let cmdInit = new Command('init')
   .description('Initialize a new HAMI working directory')
   .action(async () => {
     const opts = { verbose: !!program.opts().verbose };
-    await handleInit(opts);
+    await handleInit(registry, opts);
   });
 program.addCommand(cmdInit);
 
@@ -50,6 +52,7 @@ let cmdConfig = new Command('config')
       }
       if (!isGet && !isSet && !isRemove) {
         await handleGetAll(
+          registry,
           opts,
           {
             target,
@@ -57,6 +60,7 @@ let cmdConfig = new Command('config')
         );
       } else if (isGet) {
         await handleGet(
+          registry,
           opts,
           {
             target,
@@ -65,6 +69,7 @@ let cmdConfig = new Command('config')
         );
       } else if (isSet) {
         await handleSet(
+          registry,
           opts,
           {
             target,
@@ -74,6 +79,7 @@ let cmdConfig = new Command('config')
         );
       } else if (isRemove) {
         await handleRemove(
+          registry,
           opts,
           {
             target,
@@ -97,7 +103,7 @@ let cmdTrace = new Command('trace')
         try {
           const isVerbose = !!program.opts().verbose;
           const opts = { verbose: isVerbose };
-          await handleTraceList(opts);
+          await handleTraceList(registry, opts);
         } catch (error) {
           console.log('Error handling trace list command:', error);
           process.exit(1);
@@ -112,7 +118,7 @@ let cmdTrace = new Command('trace')
         try {
           const isVerbose = !!program.opts().verbose;
           const opts = { verbose: isVerbose };
-          await handleTraceShow(opts, traceId);
+          await handleTraceShow(registry, opts, traceId);
         } catch (error) {
           console.log('Error handling trace show command:', error);
           process.exit(1);
@@ -127,7 +133,7 @@ let cmdTrace = new Command('trace')
         try {
           const isVerbose = !!program.opts().verbose;
           const opts = { verbose: isVerbose };
-          await handleTraceGrep(opts, query);
+          await handleTraceGrep(registry, opts, query);
         } catch (error) {
           console.log('Error handling trace grep command:', error);
           process.exit(1);

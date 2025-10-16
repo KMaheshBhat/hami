@@ -1,16 +1,16 @@
 import { Flow } from "pocketflow";
 
-import { ValidateNode } from "@hami/core-fs";
-import { CoreTraceFSGrepNode, CoreTraceFSListNode, CoreTraceFSShowNode } from "@hami/core-trace-fs";
+import { HAMIRegistrationManager } from "@hami/core";
 
 import { startContext, ValidateErrorHandlerNode } from "./common.js";
 
 export async function handleTraceList(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const coreTraceFSList = new CoreTraceFSListNode();
+    const coreTraceFSList = registry.createNode("core-trace-fs:list", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSList);
     const shared: Record<string, any> = {
@@ -26,12 +26,13 @@ export async function handleTraceList(
 }
 
 export async function handleTraceShow(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     traceId: string,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const coreTraceFSShow = new CoreTraceFSShowNode();
+    const coreTraceFSShow = registry.createNode("core-trace-fs:show", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSShow);
     const shared: Record<string, any> = {
@@ -48,12 +49,13 @@ export async function handleTraceShow(
 }
 
 export async function handleTraceGrep(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     searchQuery: string,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const coreTraceFSGrep = new CoreTraceFSGrepNode();
+    const coreTraceFSGrep = registry.createNode("core-trace-fs:grep", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSGrep);
     const shared: Record<string, any> = {

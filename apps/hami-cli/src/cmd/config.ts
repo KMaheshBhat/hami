@@ -1,18 +1,17 @@
 import { Flow } from "pocketflow";
 
-import { CoreConfigFSGetAllNode, CoreConfigFSGetNode, CoreConfigFSRemoveNode, CoreConfigFSSetNode } from "@hami/core-config-fs";
-import { ValidateNode } from "@hami/core-fs";
-import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
+import { HAMIRegistrationManager } from "@hami/core";
 
 import { startContext, ValidateErrorHandlerNode } from "./common.js";
 
 export async function handleGetAll(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const coreConfigFSGetAll = new CoreConfigFSGetAllNode();
+    const coreConfigFSGetAll = registry.createNode("core-config-fs:get-all", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreConfigFSGetAll);
     const shared: Record<string, any> = {
@@ -29,12 +28,13 @@ export async function handleGetAll(
 }
 
 export async function handleGet(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const coreConfigFSGet = new CoreConfigFSGetNode();
+    const coreConfigFSGet = registry.createNode("core-config-fs:get", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreConfigFSGet);
     const shared: Record<string, any> = {
@@ -51,12 +51,13 @@ export async function handleGet(
 }
 
 export async function handleSet(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const traceDataInject = new CoreTraceFSInjectNode({
+    const traceDataInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',
         operation: 'set',
@@ -64,8 +65,8 @@ export async function handleSet(
         key: inPayload.configKey,
         value: inPayload.configValue,
     });
-    const coreConfigFSSet = new CoreConfigFSSetNode();
-    const coreTraceFSLog = new CoreTraceFSLogNode();
+    const coreConfigFSSet = registry.createNode("core-config-fs:set", {});
+    const coreTraceFSLog = registry.createNode("core-trace-fs:log", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(traceDataInject).next(coreConfigFSSet).next(coreTraceFSLog);
     const shared: Record<string, any> = {
@@ -79,20 +80,21 @@ export async function handleSet(
 }
 
 export async function handleRemove(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
-    const validateWorkingDirectory = new ValidateNode();
+    const validateWorkingDirectory = registry.createNode("core-fs:validate", {});
     const validateErrorHandler = new ValidateErrorHandlerNode();
-    const traceDataInject = new CoreTraceFSInjectNode({
+    const traceDataInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',
         operation: 'remove',
         target: inPayload.target,
         key: inPayload.configKey,
     });
-    const coreConfigFSRemove = new CoreConfigFSRemoveNode();
-    const coreTraceFSLog = new CoreTraceFSLogNode();
+    const coreConfigFSRemove = registry.createNode("core-config-fs:remove", {});
+    const coreTraceFSLog = registry.createNode("core-trace-fs:log", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(traceDataInject).next(coreConfigFSRemove).next(coreTraceFSLog);
     const shared: Record<string, any> = {

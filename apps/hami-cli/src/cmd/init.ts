@@ -2,11 +2,13 @@ import { Flow } from "pocketflow";
 
 import { CoreFSOpts, InitWorkingDirectoryNode } from "@hami/core-fs";
 import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
+import { HAMIRegistrationManager } from "@hami/core";
 
 export async function handleInit(
+    registry: HAMIRegistrationManager,
     opts: Record<string, any>,
 ) {
-    const initWorkingDirectory = new InitWorkingDirectoryNode({
+    const initWorkingDirectory = registry.createNode("core-fs:init-hami", {
         strategy: 'CWD',
     });
     const traceDataInject = new CoreTraceFSInjectNode({
