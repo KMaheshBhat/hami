@@ -189,7 +189,8 @@ let cmdFlow = new Command('flow')
           const isVerbose = !!program.opts().verbose;
           const isGlobal = !!cmdFlow.opts().global;
           const opts = { verbose: isVerbose, global: isGlobal };
-          await handleFlowInit(registry, opts, name, kind, config);
+          const parsedConfig = JSON.parse(config);
+          await handleFlowInit(registry, opts, name, kind, parsedConfig);
         } catch (error) {
           console.log('Error handling flow init command:', error);
           process.exit(1);
@@ -200,12 +201,14 @@ let cmdFlow = new Command('flow')
     new Command('run')
       .description('Run a configured flow')
       .argument('<name>', 'Flow name to run')
-      .action(async (name: string) => {
+      .argument('[payload]', 'JSON payload to pass to the flow')
+      .action(async (name: string, payload: string | undefined) => {
         try {
           const isVerbose = !!program.opts().verbose;
           const isGlobal = !!cmdFlow.opts().global;
           const opts = { verbose: isVerbose, global: isGlobal };
-          await handleFlowRun(registry, opts, name);
+          const parsedPayload = payload ? JSON.parse(payload) : undefined;
+          await handleFlowRun(registry, opts, name, parsedPayload);
         } catch (error) {
           console.log('Error handling flow run command:', error);
           process.exit(1);
