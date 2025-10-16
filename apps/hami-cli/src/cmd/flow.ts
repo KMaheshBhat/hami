@@ -48,9 +48,59 @@ export async function handleFlowRun(
   name: string,
   payload?: Record<string, any>
 ): Promise<void> {
-  // TODO: Implement flow run logic
-  // Run the configured flow by name with optional parsed payload
-  opts.verbose && console.log(`Running flow: ${name}, payload:`, payload);
+  // First step: Get the flow configuration
+  const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
+  const validateErrorHandler = new ValidateErrorHandlerNode();
+  const coreConfigFSGet = registry.createNode("core-config-fs:get", {});
+  validateWorkingDirectory.on('error', validateErrorHandler);
+  validateWorkingDirectory.next(coreConfigFSGet);
+  const shared: Record<string, any> = {
+    coreFSStrategy: 'CWD',
+    opts: opts,
+    ...startContext(),
+    target: opts.global ? 'global' : 'local',
+    configKey: `flow:${name}`,
+  };
+  const getFlow = new Flow(validateWorkingDirectory);
+  await getFlow.run(shared);
+
+  if (!shared.configValue) {
+    console.log(`Flow '${name}' not found.`);
+    return;
+  }
+
+  const { kind, config } = shared.configValue;
+  opts.verbose && console.log(`Running flow: ${name}, kind: ${kind}, config:`, config, `payload:`, payload);
+
+  // Create and run the actual flow
+  const flowNode = registry.createNode(kind, config);
+  const flowErrorHandler = new ValidateErrorHandlerNode();
+  const traceDataInject = registry.createNode("core-trace-fs:inject", {
+    executor: 'cli',
+    command: 'flow',
+    operation: 'run',
+    target: opts.global ? 'global' : 'local',
+    flowName: name,
+    flowKind: kind,
+    payload: payload,
+  });
+  const coreTraceFSLog = registry.createNode("core-trace-fs:log", {});
+  flowNode.on('error', flowErrorHandler);
+  flowNode.next(traceDataInject).next(coreTraceFSLog);
+
+  const flowShared: Record<string, any> = {
+    coreFSStrategy: 'CWD',
+    opts: opts,
+    ...startContext(),
+    ...payload, // Spread payload into shared context
+  };
+
+  const runFlow = new Flow(flowNode);
+  await runFlow.run(flowShared);
+
+  if (flowShared.results) {
+    console.log('Flow results:', flowShared.results);
+  }
 }
 
 export async function handleFlowRemove(

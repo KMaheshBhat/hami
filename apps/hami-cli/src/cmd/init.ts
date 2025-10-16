@@ -1,8 +1,8 @@
 import { Flow } from "pocketflow";
 
-import { CoreFSOpts, InitWorkingDirectoryNode } from "@hami/core-fs";
-import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
 import { HAMIRegistrationManager } from "@hami/core";
+import { CoreFSOpts } from "@hami/core-fs";
+import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
 
 export async function handleInit(
     registry: HAMIRegistrationManager,
