@@ -11,6 +11,27 @@
 - `packages/core/src/registration.ts` - HAMIRegistrationManager
 - `packages/core-fs/src/operations/copy-flow.ts` - Example HAMIFlow implementation
 
+## Development Environment
+
+### Project Root: `D:\local\work\personal\k.mahesh.bhat\repos\github.com\KMaheshBhat\hami`
+- **Type**: Bun monorepo with workspaces
+- **Build Command**: `bun run all:build` (builds all packages)
+- **CLI Install**: `bun run cli:install` (installs CLI globally)
+- **Package Structure**:
+  - `packages/core/` - Core types, registration, validation
+  - `packages/core-fs/` - File system operations
+  - `packages/core-config-fs/` - Configuration management
+  - `packages/core-trace-fs/` - Trace logging
+  - `apps/hami-cli/` - CLI application
+  - `apps/hami-server/` - Server application
+
+### Testing Directory: `D:\local\work\personal\k.mahesh.bhat\test-hami\wd1`
+- **Purpose**: Test environment with pre-configured flows
+- **Existing Configurations**:
+  - Flow configurations stored in `.hami/wd.config.json`
+  - Trace data available for testing
+- **Usage**: Run CLI commands here to test functionality
+
 ## Current Implementation Analysis
 
 ### What We Have Now
