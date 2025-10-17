@@ -1,7 +1,8 @@
-import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami/core';
 import { homedir } from 'os';
 import { join as pathJoin } from 'path';
 import { Node } from 'pocketflow';
+
+import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami/core';
 
 export function startContext(): Record<string, any> {
   let userHomeDirectory = homedir();
@@ -12,27 +13,6 @@ export function startContext(): Record<string, any> {
     userHamiDirectory: pathJoin(userHomeDirectory, '.hami')
   }
   return context;
-}
-
-/**
- * @deprecated Use EnhancedLogResult instead. This class is kept for backward compatibility
- * but will be removed in a future version. EnhancedLogResult provides configurable
- * output formats, prefixes, timestamps, and better data type handling.
- */
-export class LogResult extends Node {
-  private resultKey: string;
-  constructor(resultKey: string) {
-    super();
-    this.resultKey = resultKey;
-  }
-  async prep(shared: Record<string, any>): Promise<any | undefined> {
-    return shared[this.resultKey];
-  }
-  async exec(prepRes: any | undefined): Promise<void> {
-    if (prepRes) {
-      console.log('result(s):', prepRes);
-    }
-  }
 }
 
 export class LogErrorNode extends Node {
@@ -50,6 +30,7 @@ export class LogErrorNode extends Node {
     }
   }
 }
+
 export type LogFormat = 'generic' | 'table' | 'json' | 'custom';
 
 export interface LogResultConfig {

@@ -1,4 +1,4 @@
-import { Flow } from "pocketflow";
+import { Flow, Node } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
@@ -58,6 +58,30 @@ export async function handleTraceShow(
     });
 }
 
+export class TransformTraceResultsNode extends Node {
+    async prep(shared: Record<string, any>): Promise<any | undefined> {
+        return shared.traceResults;
+    }
+
+    async exec(prepRes: any | undefined): Promise<Record<string, any>[]> {
+        if (prepRes && prepRes.length > 0) {
+            const tableData = prepRes.map((trace: any) => ({
+                id: trace.id,
+                timestamp: trace.timestamp,
+                data: JSON.stringify(trace.data),
+            }));
+            return tableData;
+        } else {
+            return [];
+        }
+    }
+
+    async post(shared: Record<string, any>, prepRes: any | undefined, execRes: Record<string, any>[]): Promise<string | undefined> {
+        shared.transformedTraceResults = execRes;
+        return 'default';
+    }
+}
+
 export async function handleTraceGrep(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
@@ -67,24 +91,23 @@ export async function handleTraceGrep(
     validate
         .on('error', new LogErrorNode('directoryValidationErrors'));
     const grepTraces = registry.createNode("core-trace-fs:grep", {});
+    const transformResults = new TransformTraceResultsNode();
+    const logResults = new EnhancedLogResult({
+        resultKey: "transformedTraceResults",
+        format: "table",
+        prefix: "Trace search results:",
+        emptyMessage: "No traces found matching the search query.",
+        verbose: opts.verbose
+    });
     validate
-        .next(grepTraces);
-    const shared: Record<string, any> = {
+        .next(grepTraces)
+        .next(transformResults as any)
+        .next(logResults);
+    const flow = new Flow(validate);
+    await flow.run({
         coreFSStrategy: 'CWD',
         opts: opts,
         searchQuery: searchQuery,
         ...startContext(),
-    };
-    const flow = new Flow(validate);
-    await flow.run(shared);
-    if (shared.traceResults && shared.traceResults.length > 0) {
-        const tableData = shared.traceResults.map((trace: any) => ({
-            id: trace.id,
-            timestamp: trace.timestamp,
-            data: JSON.stringify(trace.data),
-        }));
-        console.table(tableData);
-    } else {
-        console.log('No traces found matching the search query.');
-    }
+    });
 }

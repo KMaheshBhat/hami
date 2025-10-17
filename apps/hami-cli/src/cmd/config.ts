@@ -2,7 +2,7 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, LogErrorNode, EnhancedLogResult } from "./common.js";
+import { EnhancedLogResult, LogErrorNode, startContext } from "./common.js";
 
 export async function handleConfigList(
     registry: HAMIRegistrationManager,
@@ -41,19 +41,23 @@ export async function handleConfigGet(
     validate
         .on('error', new LogErrorNode('directoryValidationErrors'));
     const getConfig = registry.createNode("core-config-fs:get", {});
+    const logConfig = new EnhancedLogResult({
+        resultKey: "configValue",
+        format: "generic",
+        prefix: "Configuration value:",
+        emptyMessage: "Configuration key not found.",
+        verbose: opts.verbose
+    });
     validate
-        .next(getConfig);
-    const shared: Record<string, any> = {
+        .next(getConfig)
+        .next(logConfig);
+    const flow = new Flow(validate);
+    await flow.run({
         coreFSStrategy: 'CWD',
         opts: opts,
         ...startContext(),
         ...inPayload,
-    };
-    const flow = new Flow(validate);
-    await flow.run(shared);
-    if (shared.configValue) {
-        console.log(shared.configValue);
-    }
+    });
 }
 
 export async function handleConfigSet(
