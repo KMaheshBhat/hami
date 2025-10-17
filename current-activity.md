@@ -212,23 +212,19 @@ export class EnhancedLogResult extends Node {
 }
 ```
 
-## Migration Strategy
+## Tasks
 
-### Phase 1: Backward Compatibility (Safe Introduction)
-1. **Keep existing `LogResult` class** - Don't break any existing code
-2. **Create `EnhancedLogResult` alongside it** - Add the new class in the same file
-3. **Update `handleFlowRun()` to use enhanced version optionally** - Have the user test with one command first
+### Task 1: Create Enhanced LogResult Class
+- Implement the enhanced `LogResult` class with all features
+- Add comprehensive TypeScript types
+- Create factory functions for common use cases
 
-**Why start here?** This phase ensures we don't break existing functionality while introducing the new features.
+**Key files to create/modify:**
+- `apps/hami-cli/src/cmd/common.ts` - Add `EnhancedLogResult` class and types
+- `apps/hami-cli/src/cmd/common.ts` - Add factory functions
 
-### Phase 2: Gradual Migration (Rollout Features)
-1. **Update specific commands to use enhanced features** - Replace `console.log` calls in config.ts and trace.ts
-2. **Create convenience factory functions** - Make it easy to create loggers with common configurations
-3. **Add configuration support in CLI options** - Let users control logging format from command line
-
-**Example factory functions:**
+**Factory functions to create:**
 ```typescript
-// Easy-to-use helpers for common logging patterns
 export function createTableLogger(resultKey: string, prefix: string) {
   return new EnhancedLogResult({ resultKey, format: 'table', prefix });
 }
@@ -238,16 +234,55 @@ export function createJsonLogger(resultKey: string, includeTimestamp = false) {
 }
 ```
 
-### Phase 3: Consolidation (Cleanup)
-1. **Deprecate old `LogResult`** - Mark it as deprecated with comments and documentation
-2. **Update all commands to use enhanced version** - Complete migration across the codebase
-3. **Remove legacy implementation** - Clean up old code after confirming everything works
+### Task 2: Update Flow Commands
+- Update `handleFlowRun()` to use enhanced logging
+- Add configuration options for flow-specific formatting
+- Test backward compatibility
 
-**Migration checklist for each command:**
-- [ ] Replace `new LogResult(key)` with `new EnhancedLogResult({ resultKey: key })`
-- [ ] Replace `console.table(data)` with enhanced logger using `format: 'table'`
-- [ ] Replace `console.log(JSON.stringify(data))` with enhanced logger using `format: 'json'`
-- [ ] request user to test and ensure output looks good
+**Migration example:**
+```typescript
+// Before
+const logResults = new LogResult("results");
+
+// After
+const logResults = new EnhancedLogResult({
+  resultKey: "results",
+  format: "table",
+  prefix: "Flow execution results:",
+  includeTimestamp: true
+});
+```
+
+### Task 3: Update Config Commands
+- Update `handleConfigList()` to use enhanced logging
+- Replace direct `console.table(shared.configValues)` calls
+- Add proper empty result handling
+
+**Files to update:**
+- `apps/hami-cli/src/cmd/config.ts`
+
+### Task 4: Update Trace Commands
+- Update `handleTraceList()` and `handleTraceShow()` to use enhanced logging
+- Replace `console.table(shared.traceResults)` and `console.log(JSON.stringify(...))` calls
+- Add proper empty result handling
+
+**Files to update:**
+- `apps/hami-cli/src/cmd/trace.ts`
+
+### Task 5: Add Configuration Support
+- Add logging format options to CLI configuration
+- Support global and per-command logging settings
+- Add verbose mode support
+
+**Consider adding CLI flags like:**
+- `--log-format table|json|generic`
+- `--log-timestamp` (boolean)
+- `--log-verbose` (boolean)
+
+### Task 6: Deprecate Old Implementation
+- Mark `LogResult` as deprecated with comments
+- Update all remaining usage to use `EnhancedLogResult`
+- Remove legacy implementation after testing
 
 ## Usage Examples
 
@@ -373,70 +408,3 @@ if (!prepRes) {
 - **Early returns**: Use guard clauses to reduce nesting
 - **Consistent formatting**: Follow the existing codebase style
 - **Type safety**: Leverage TypeScript's type system instead of runtime checks where possible
-
-## Implementation Plan
-
-### Step 1: Create Enhanced LogResult Class
-- Implement the enhanced `LogResult` class with all features
-- Add comprehensive TypeScript types
-
-**Key files to create/modify:**
-- `apps/hami-cli/src/cmd/common.ts` - Add `EnhancedLogResult` class and types
-- `apps/hami-cli/src/cmd/common.ts` - Add factory functions for common use cases
-
-### Step 2: Update Flow Commands
-- Update `handleFlowRun()` to use enhanced logging
-- Add configuration options for flow-specific formatting
-
-**Migration example:**
-```typescript
-// Before
-const logResults = new LogResult("results");
-
-// After
-const logResults = new EnhancedLogResult({
-  resultKey: "results",
-  format: "table",
-  prefix: "Flow execution results:",
-  includeTimestamp: true
-});
-```
-
-### Step 3: Migrate Other Commands
-- Update `config.ts` commands to use enhanced logging
-- Update `trace.ts` commands to use enhanced logging
-- Remove direct `console.log`/`console.table` usage
-
-**Files to update:**
-- `apps/hami-cli/src/cmd/config.ts` - Replace `console.table(shared.configValues)`
-- `apps/hami-cli/src/cmd/trace.ts` - Replace `console.log(JSON.stringify(...))`
-
-### Step 4: Add Configuration Support
-- Add logging format options to CLI configuration
-- Support global and per-command logging settings
-- Add verbose mode support
-
-**Consider adding CLI flags like:**
-- `--log-format table|json|generic`
-- `--log-timestamp` (boolean)
-- `--log-verbose` (boolean)
-
-## Current Status
-The current `LogResult` implementation is functional but limited. The enhanced version will provide flexible, configurable logging that can adapt to different data types and user preferences while maintaining backward compatibility.
-
-## Summary for Junior Developers
-
-**What we're doing:** Upgrading the simple logging system to be much more powerful and user-friendly.
-
-**Why it matters:** Better logging means users get clearer, more helpful output from CLI commands, and developers have an easier time maintaining the code.
-
-**Key improvements:**
-- **Multiple display formats** (tables, JSON, plain text)
-- **Customizable labels** (instead of always saying "result(s):")
-- **Smart formatting** (automatically chooses the best display for your data)
-- **Optional timestamps** (helpful for debugging)
-- **Better empty data handling** (shows helpful messages instead of nothing)
-
-**Next steps:** This document is ready for review. Once approved, we'll implement the `EnhancedLogResult` class and gradually migrate the existing code to use it.
-
-**Ready to implement the enhanced LogResult solution!** 🔄
