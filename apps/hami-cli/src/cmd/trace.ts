@@ -2,7 +2,7 @@ import { Flow, Node } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, LogErrorNode, EnhancedLogResult } from "./common.js";
+import { startContext } from "./common.js";
 
 export async function handleTraceList(
     registry: HAMIRegistrationManager,
@@ -10,9 +10,9 @@ export async function handleTraceList(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const listTraces = registry.createNode("core-trace-fs:list", {});
-    const logTraces = new EnhancedLogResult({
+    const logTraces = registry.createNode("core:log-result", {
         resultKey: "traceResults",
         format: "table",
         prefix: "Trace entries:",
@@ -37,9 +37,9 @@ export async function handleTraceShow(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const showTrace = registry.createNode("core-trace-fs:show", {});
-    const logTrace = new EnhancedLogResult({
+    const logTrace = registry.createNode("core:log-result", {
         resultKey: "traceData",
         format: "json",
         prefix: "Trace data:",
@@ -89,10 +89,10 @@ export async function handleTraceGrep(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const grepTraces = registry.createNode("core-trace-fs:grep", {});
     const transformResults = new TransformTraceResultsNode();
-    const logResults = new EnhancedLogResult({
+    const logResults = registry.createNode("core:log-result", {
         resultKey: "transformedTraceResults",
         format: "table",
         prefix: "Trace search results:",

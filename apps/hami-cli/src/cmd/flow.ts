@@ -2,7 +2,7 @@ import { Flow, Node } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { DynamicRunnerFlow, EnhancedLogResult, LogErrorNode, startContext } from "./common.js";
+import { startContext } from "./common.js";
 
 export interface FlowOptions {
     verbose: boolean;
@@ -18,7 +18,7 @@ export async function handleFlowInit(
 ): Promise<void> {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode("directoryValidationErrors"));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const traceInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'flow',
@@ -52,11 +52,11 @@ export async function handleFlowRun(
 ): Promise<void> {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode("directoryValidationErrors"))
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }))
     const getConfig = registry.createNode("core-config-fs:get", {});
-    const runner = new DynamicRunnerFlow({ runnerConfigValueKey: 'configValue' });
+    const runner = registry.createNode('core:dynamic-runner-flow', { runnerConfigValueKey: 'configValue' });
     runner
-        .on('error', new LogErrorNode("dynamicRunnerError"));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'dynamicRunnerError' }));
     const traceInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'flow',
@@ -65,7 +65,7 @@ export async function handleFlowRun(
         name: `flow:${name}`,
     });
     const traceLog = registry.createNode("core-trace-fs:log", {});
-    const logResults = new EnhancedLogResult({
+    const logResults = registry.createNode("core:log-result", {
         resultKey: "results",
         format: "table",
         prefix: "Flow execution results:",
@@ -97,7 +97,7 @@ export async function handleFlowRemove(
 ): Promise<void> {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode("directoryValidationErrors"));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const traceInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'flow',
@@ -158,10 +158,10 @@ export async function handleFlowList(
 ): Promise<void> {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode("directoryValidationErrors"));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const getAllConfig = registry.createNode("core-config-fs:get-all", {});
     const filterFlows = new FilterFlowsNode();
-    const logFlows = new EnhancedLogResult({
+    const logFlows = registry.createNode("core:log-result", {
         resultKey: "flowConfigs",
         format: "table",
         prefix: "Configured flows:",

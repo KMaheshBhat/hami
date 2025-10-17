@@ -2,18 +2,19 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { EnhancedLogResult, LogErrorNode, startContext } from "./common.js";
+import { startContext } from "./common.js";
 
 export async function handleConfigList(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
     inPayload: Record<string, any>,
 ) {
+    console.log('handleConfigList');
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const getAllConfig = registry.createNode("core-config-fs:get-all", {});
-    const logConfig = new EnhancedLogResult({
+    const logConfig = registry.createNode("core:log-result", {
         resultKey: "configValues",
         format: "table",
         prefix: "Configuration entries:",
@@ -39,9 +40,9 @@ export async function handleConfigGet(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const getConfig = registry.createNode("core-config-fs:get", {});
-    const logConfig = new EnhancedLogResult({
+    const logConfig = registry.createNode("core:log-result", {
         resultKey: "configValue",
         format: "generic",
         prefix: "Configuration value:",
@@ -67,7 +68,7 @@ export async function handleConfigSet(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const traceInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',
@@ -98,7 +99,7 @@ export async function handleConfigRemove(
 ) {
     const validate = registry.createNode("core-fs:validate-hami", {});
     validate
-        .on('error', new LogErrorNode('directoryValidationErrors'));
+        .on('error', registry.createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
     const traceInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',

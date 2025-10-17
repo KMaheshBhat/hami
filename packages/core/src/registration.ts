@@ -255,6 +255,7 @@ export class HAMIRegistrationManager {
   }
 }
 
+
 /**
  * Global HAMI registration manager instance
  */

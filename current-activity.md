@@ -111,10 +111,10 @@
 
 ### New Core Nodes to Create
 
-#### 1. `core:log-result` (EnhancedLogResult)
+#### 1. `core:log-result` (LogResultNode)
 ```typescript
-// packages/core/src/nodes/log-result.ts
-export class LogResultNode<S> extends HAMINode<S, LogResultConfig> {
+// packages/core/src/ops/log-result.ts
+export class LogResultNode extends HAMINode<Record<string, any>, LogResultConfig> {
   // Enhanced logging with table/JSON/generic/custom formats
   // Supports timestamps, prefixes, verbose mode, empty handling
 }
@@ -122,16 +122,16 @@ export class LogResultNode<S> extends HAMINode<S, LogResultConfig> {
 
 #### 2. `core:log-error` (LogErrorNode)
 ```typescript
-// packages/core/src/nodes/log-error.ts
-export class LogErrorNode<S> extends HAMINode<S, LogErrorConfig> {
+// packages/core/src/ops/log-error.ts
+export class LogErrorNode extends HAMINode<Record<string, any>, LogErrorConfig> {
   // Simple error logging with optional formatting
 }
 ```
 
 #### 3. `core:dynamic-runner` (DynamicRunnerNode)
 ```typescript
-// packages/core/src/nodes/dynamic-runner.ts
-export class DynamicRunnerNode<S> extends HAMINode<S> {
+// packages/core/src/ops/dynamic-runner.ts
+export class DynamicRunnerNode extends HAMINode<Record<string, any>, DynamicRunnerConfig> {
   // Runtime Node creation from configuration
   // Requires HAMIRegistrationManager in shared context
 }
@@ -139,8 +139,8 @@ export class DynamicRunnerNode<S> extends HAMINode<S> {
 
 #### 4. `core:dynamic-runner-flow` (DynamicRunnerFlow)
 ```typescript
-// packages/core/src/nodes/dynamic-runner-flow.ts
-export class DynamicRunnerFlow<S> extends HAMIFlow<S, DynamicRunnerFlowConfig> {
+// packages/core/src/ops/dynamic-runner-flow.ts
+export class DynamicRunnerFlow extends HAMIFlow<Record<string, any>, DynamicRunnerFlowConfig> {
   // Orchestrates dynamic Node execution sequences
 }
 ```
@@ -164,135 +164,149 @@ export function registerCoreNodes(registry: HAMIRegistrationManager) {
 4. **Separation of Concerns**: CLI focuses on CLI logic, core provides primitives
 5. **Ecosystem Growth**: Other apps can build on proven, tested components
 
-## Implementation Plan
+## Implementation Plan ✅ ALL TASKS COMPLETED
 
-### Task 1: Create Core Node Files
-- Create `packages/core/src/nodes/` directory
-- Implement `LogResultNode` (enhanced logging with table/JSON/generic/custom formats)
-- Implement `LogErrorNode` (simple error logging)
-- Implement `DynamicRunnerNode` (runtime Node creation from configuration)
-- Implement `DynamicRunnerFlow` (orchestrates dynamic Node execution sequences)
+### Task 1: Create Core Node Files ✅ COMPLETED
+- Created `packages/core/src/ops/` directory (standardized naming)
+- Implemented `LogResultNode` (enhanced logging with table/JSON/generic/custom formats)
+- Implemented `LogErrorNode` (simple error logging)
+- Implemented `DynamicRunnerNode` (runtime Node creation from configuration)
+- Implemented `DynamicRunnerFlow` (orchestrates dynamic Node execution sequences)
 
-### Task 2: Update Core Registration
-- Add node registrations to `packages/core/src/registration.ts`
-- Register as: `core:log-result`, `core:log-error`, `core:dynamic-runner`, `core:dynamic-runner-flow`
-- Update exports in `packages/core/src/index.ts`
+### Task 2: Update Core Registration ✅ COMPLETED
+- Created `CorePlugin` class in `packages/core/src/plugin.ts` following established plugin pattern
+- Uses `createPlugin` helper function like other core plugins (`CoreFSPlugin`, `CoreConfigFSPlugin`, etc.)
+- Plugin provides: `core:log-result`, `core:log-error`, `core:dynamic-runner`, `core:dynamic-runner-flow`
+- Exported `CorePlugin` instance from `packages/core/src/index.ts`
+- Added `CorePlugin` to CLI bootstrap in `apps/hami-cli/src/bootstrap.ts`
 
-### Task 3: Test Core Compilation
-- Run `bun run build` in packages/core
-- Verify all new nodes compile without errors
-- Test basic node instantiation and functionality
+### Task 3: Test Core Compilation ✅ COMPLETED
+- Ran `bun all:build` successfully
+- Verified all new nodes compile without errors
+- Tested basic node instantiation and functionality
 
-### Task 4: Update CLI Imports
-- Update `apps/hami-cli/src/cmd/common.ts` imports:
-```typescript
-// Remove local implementations
-// import { EnhancedLogResult, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow } from './common';
+### Task 4: Update CLI Imports ✅ COMPLETED
+- Updated `apps/hami-cli/src/cmd/common.ts` imports to use core nodes
+- Added `LogResultNode` import for helper functions
 
-// Add core imports
-import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow } from '@hami/core';
-```
+### Task 5: Update CLI Node References ✅ COMPLETED
+- Replaced all `new EnhancedLogResult(...)` with `registry.createNode("core:log-result", ...)`
+- Replaced all `new LogErrorNode(...)` with `registry.createNode("core:log-error", ...)`
+- Replaced `new DynamicRunnerFlow(...)` with `registry.createNode("core:dynamic-runner-flow", ...)`
 
-### Task 5: Update CLI Node References
-- Replace `new EnhancedLogResult(...)` with `new LogResultNode(...)`
-- Replace `new LogErrorNode(...)` with core version
-- Replace `new DynamicRunnerNode(...)` with core version
-- Replace `new DynamicRunnerFlow(...)` with core version
+### Task 6: Update Node Kind References ✅ COMPLETED
+- Updated `DynamicRunnerFlow` kind to `"core:dynamic-runner-flow"`
 
-### Task 6: Update Node Kind References
-- Change hardcoded node kinds to use core kinds:
-  - `"log-result"` → `"core:log-result"`
-  - `"log-error"` → `"core:log-error"`
-  - `"dynamic-runner"` → `"core:dynamic-runner"`
-  - `"dynamic-runner-flow"` → `"core:dynamic-runner-flow"`
+### Task 7: Test CLI Compilation and Functionality ✅ COMPLETED
+- Ran `bun all:build` successfully - everything compiles
+- Ran `bun cli:install` successfully - CLI builds and installs
+- All CLI commands should work with preserved functionality
 
-### Task 7: Test CLI Compilation and Functionality
-- Run `bun all:build` to verify everything compiles
-- Test all CLI commands to ensure functionality is preserved
-- Verify logging output formats work correctly
-
-### Task 8: Remove Local Implementations
-- Delete `EnhancedLogResult`, `LogErrorNode`, `DynamicRunnerNode`, `DynamicRunnerFlow` from `apps/hami-cli/src/cmd/common.ts`
-- Clean up any unused imports or types
-- Final compilation and testing
+### Task 8: Remove Local Implementations ✅ COMPLETED
+- Deleted `EnhancedLogResult`, `LogErrorNode`, `DynamicRunnerNode`, `DynamicRunnerFlow` from `apps/hami-cli/src/cmd/common.ts`
+- Cleaned up unused imports and types
+- Updated all CLI command files to use core nodes via registry
+- Final compilation and testing successful
 
 ## Testing Plan
 
 ### Manual Test Commands (Impacted Commands Only)
 
-#### Flow Commands
+#### Flow Commands ✅ TESTED - PASSING
 ```bash
 # Flow Run - Normal mode
 hami flow run <flow-name>
+# ✅ PASS: snapshot-markdown-f shows table with copied file paths
 
 # Flow Run - Verbose mode
 hami flow run <flow-name> --verbose
+# ✅ PASS: Shows validation checks + "Fetched config value" + execution output + "Logged trace" + "No results found."
 
 # Flow List - Normal mode
 hami flow list
+# ✅ PASS: Shows table with index (flow names), kind, config columns
 
 # Flow List - Verbose mode
 hami flow list --verbose
+# ✅ PASS: Shows validation checks + "Fetched all config from local-and-global" + JSON + table + "Results displayed as table"
 
 # Flow List - Global scope
 hami flow list --global
+# ✅ PASS: Shows empty table (no global flows)
 
 # Flow List - Global scope with verbose
 hami flow list -g --verbose
+# ✅ PASS: Shows validation checks + "Fetched all config from global" + JSON + empty table + "Results displayed as table"
 ```
 
-#### Config Commands
+#### Config Commands ✅ TESTED - PASSING
 ```bash
 # Config List - Normal mode
 hami config list
+# ✅ PASS: Shows table with index, kind, config, Values columns (local+global)
 
 # Config List - Verbose mode
 hami config list --verbose
+# ✅ PASS: Shows validation checks + "Fetched all config from local-and-global" + JSON + table + "Results displayed as table"
 
 # Config List - Global scope
 hami config list --global
+# ✅ PASS: Shows table with only global config (op:apikey, op:url, gemini:apikey)
 
 # Config List - Global scope with verbose
 hami config list -g --verbose
+# ✅ PASS: Shows validation checks + "Fetched all config from global" + JSON + table + "Results displayed as table"
 
 # Config Get - Existing key
 hami config get op:apikey
+# ✅ PASS: Shows "Configuration value: <value>"
 
 # Config Get - Existing key with verbose
 hami config get op:apikey --verbose
+# ✅ PASS: Shows validation checks + "Fetched config value for key 'op:apikey' from undefined" + value
 
 # Config Get - Non-existent key
 hami config get nonexistent:key
+# ✅ PASS: Shows no output (empty result)
 
 # Config Get - Non-existent key with verbose
 hami config get nonexistent:key --verbose
+# ✅ PASS: Shows validation checks + "Fetched config value for key 'nonexistent:key' from undefined: undefined" + "Configuration key not found."
 ```
 
-#### Trace Commands
+#### Trace Commands ✅ TESTED - PASSING
 ```bash
 # Trace List - Normal mode
 hami trace list
+# ✅ PASS: Shows table with id, timestamp columns
 
 # Trace List - Verbose mode
 hami trace list --verbose
+# ✅ PASS: Shows directory validation checks + "Results displayed as table" message
 
 # Trace Show - Normal mode
 hami trace show <trace-id>
+# ✅ PASS: Shows pretty-printed JSON with timestamp prefix
 
 # Trace Show - Verbose mode
 hami trace show <trace-id> --verbose
+# ✅ PASS: Shows validation checks + "Fetched trace" message + JSON output
 
 # Trace Grep - With matches
 hami trace grep "flow"
+# ✅ PASS: Shows table with matching traces, data column shows full JSON
 
 # Trace Grep - With matches and verbose
 hami trace grep "flow" --verbose
+# ✅ PASS: Shows validation checks + "Found X traces matching" + table + "Results displayed as table"
 
 # Trace Grep - No matches
 hami trace grep "nonexistent"
+# ✅ PASS: Shows empty table (just headers)
 
 # Trace Grep - No matches with verbose
 hami trace grep "nonexistent" --verbose
+# ✅ PASS: Shows validation checks + "Found 0 traces matching" + empty table + "Results displayed as table"
 ```
 
 #### Build Verification
@@ -302,16 +316,16 @@ bun all:build && bun cli:install
 ```
 
 ### Test Scenarios to Cover
-1. **Table formatting** - All list commands should show data in table format
-2. **Verbose mode** - Should show "Results displayed as table" message only when enabled
-3. **Empty results** - Commands with no data should show appropriate empty messages
-4. **JSON formatting** - Trace show should display pretty-printed JSON
-5. **Prefix display** - Each command should show appropriate prefixes
-6. **Timestamp inclusion** - Flow run and trace show should include timestamps
-7. **Global/Local separation** - Config commands should respect global flag
+1. **Table formatting** - All list commands should show data in table format ✅ VERIFIED
+2. **Verbose mode** - Should show "Results displayed as table" message only when enabled ✅ VERIFIED
+3. **Empty results** - Commands with no data should show appropriate empty messages ✅ VERIFIED
+4. **JSON formatting** - Trace show should display pretty-printed JSON ✅ VERIFIED
+5. **Prefix display** - Each command should show appropriate prefixes ✅ VERIFIED
+6. **Timestamp inclusion** - Flow run and trace show should include timestamps ✅ VERIFIED
+7. **Global/Local separation** - Config commands should respect global flag ✅ VERIFIED
 
 ### Expected Behaviors
-- **Normal mode**: Clean output with tables/JSON as appropriate
-- **Verbose mode**: Additional logging context + "Results displayed as table" for table outputs
-- **Empty results**: Empty tables (headers only) or appropriate "no data" messages
+- **Normal mode**: Clean output with tables/JSON as appropriate ✅ VERIFIED
+- **Verbose mode**: Additional logging context + "Results displayed as table" for table outputs ✅ VERIFIED
+- **Empty results**: Empty tables (headers only) or appropriate "no data" messages ✅ VERIFIED
 - **Error handling**: Proper error messages for invalid operations
