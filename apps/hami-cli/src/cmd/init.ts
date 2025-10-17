@@ -8,19 +8,19 @@ export async function handleInit(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
 ) {
-    const initWorkingDirectory = registry.createNode("core-fs:init-hami", {
+    const init = registry.createNode("core-fs:init-hami", {
         strategy: 'CWD',
     });
-    const traceDataInject = new CoreTraceFSInjectNode({
+    const traceInject = new CoreTraceFSInjectNode({
         executor: 'cli',
         command: 'init',
     });
-    const coreTraceFSLog = new CoreTraceFSLogNode();
-    initWorkingDirectory
-        .next(traceDataInject)
-        .next(coreTraceFSLog);
-    const initFlow = new Flow(initWorkingDirectory);
-    await initFlow.run({
+    const traceLog = new CoreTraceFSLogNode();
+    init
+        .next(traceInject)
+        .next(traceLog);
+    const flow = new Flow(init);
+    await flow.run({
         opts: opts as CoreFSOpts,
     });
 }

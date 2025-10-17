@@ -8,18 +8,19 @@ export async function handleTraceList(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
 ) {
-    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
-    const coreTraceFSList = registry.createNode("core-trace-fs:list", {});
-    validateWorkingDirectory.on('error', validateErrorHandler);
-    validateWorkingDirectory.next(coreTraceFSList);
+    const validate = registry.createNode("core-fs:validate-hami", {});
+    validate
+        .on('error', new LogErrorNode('directoryValidationErrors'));
+    const listTraces = registry.createNode("core-trace-fs:list", {});
+    validate
+        .next(listTraces);
     const shared: Record<string, any> = {
         coreFSStrategy: 'CWD',
         opts: opts,
         ...startContext(),
     };
-    const listFlow = new Flow(validateWorkingDirectory);
-    await listFlow.run(shared);
+    const flow = new Flow(validate);
+    await flow.run(shared);
     if (shared.traceResults) {
         console.table(shared.traceResults);
     }
@@ -30,19 +31,20 @@ export async function handleTraceShow(
     opts: Record<string, any>,
     traceId: string,
 ) {
-    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
-    const coreTraceFSShow = registry.createNode("core-trace-fs:show", {});
-    validateWorkingDirectory.on('error', validateErrorHandler);
-    validateWorkingDirectory.next(coreTraceFSShow);
+    const validate = registry.createNode("core-fs:validate-hami", {});
+    validate
+        .on('error', new LogErrorNode('directoryValidationErrors'));
+    const showTrace = registry.createNode("core-trace-fs:show", {});
+    validate
+        .next(showTrace);
     const shared: Record<string, any> = {
         coreFSStrategy: 'CWD',
         opts: opts,
         traceId: traceId,
         ...startContext(),
     };
-    const showFlow = new Flow(validateWorkingDirectory);
-    await showFlow.run(shared);
+    const flow = new Flow(validate);
+    await flow.run(shared);
     if (shared.traceData) {
         console.log(JSON.stringify(shared.traceData, null, 2));
     }
@@ -53,19 +55,20 @@ export async function handleTraceGrep(
     opts: Record<string, any>,
     searchQuery: string,
 ) {
-    const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
-    const coreTraceFSGrep = registry.createNode("core-trace-fs:grep", {});
-    validateWorkingDirectory.on('error', validateErrorHandler);
-    validateWorkingDirectory.next(coreTraceFSGrep);
+    const validate = registry.createNode("core-fs:validate-hami", {});
+    validate
+        .on('error', new LogErrorNode('directoryValidationErrors'));
+    const grepTraces = registry.createNode("core-trace-fs:grep", {});
+    validate
+        .next(grepTraces);
     const shared: Record<string, any> = {
         coreFSStrategy: 'CWD',
         opts: opts,
         searchQuery: searchQuery,
         ...startContext(),
     };
-    const grepFlow = new Flow(validateWorkingDirectory);
-    await grepFlow.run(shared);
+    const flow = new Flow(validate);
+    await flow.run(shared);
     if (shared.traceResults && shared.traceResults.length > 0) {
         const tableData = shared.traceResults.map((trace: any) => ({
             id: trace.id,
