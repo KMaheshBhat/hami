@@ -217,7 +217,7 @@ export class EnhancedLogResult extends Node {
 ### Phase 1: Backward Compatibility (Safe Introduction)
 1. **Keep existing `LogResult` class** - Don't break any existing code
 2. **Create `EnhancedLogResult` alongside it** - Add the new class in the same file
-3. **Update `handleFlowRun()` to use enhanced version optionally** - Test with one command first
+3. **Update `handleFlowRun()` to use enhanced version optionally** - Have the user test with one command first
 
 **Why start here?** This phase ensures we don't break existing functionality while introducing the new features.
 
@@ -247,7 +247,7 @@ export function createJsonLogger(resultKey: string, includeTimestamp = false) {
 - [ ] Replace `new LogResult(key)` with `new EnhancedLogResult({ resultKey: key })`
 - [ ] Replace `console.table(data)` with enhanced logger using `format: 'table'`
 - [ ] Replace `console.log(JSON.stringify(data))` with enhanced logger using `format: 'json'`
-- [ ] Test that output looks good and functionality is preserved
+- [ ] request user to test and ensure output looks good
 
 ## Usage Examples
 
@@ -379,7 +379,6 @@ if (!prepRes) {
 ### Step 1: Create Enhanced LogResult Class
 - Implement the enhanced `LogResult` class with all features
 - Add comprehensive TypeScript types
-- Include unit tests for all formatting options
 
 **Key files to create/modify:**
 - `apps/hami-cli/src/cmd/common.ts` - Add `EnhancedLogResult` class and types
@@ -388,7 +387,6 @@ if (!prepRes) {
 ### Step 2: Update Flow Commands
 - Update `handleFlowRun()` to use enhanced logging
 - Add configuration options for flow-specific formatting
-- Test backward compatibility
 
 **Migration example:**
 ```typescript
@@ -422,17 +420,6 @@ const logResults = new EnhancedLogResult({
 - `--log-format table|json|generic`
 - `--log-timestamp` (boolean)
 - `--log-verbose` (boolean)
-
-### Step 5: Deploy and Monitor
-- Deploy the enhanced logging to production
-- Monitor for any issues with the new implementation
-- Gather user feedback on the improved output formats
-
-**Testing strategy:**
-- Unit tests for each format type
-- Integration tests with actual CLI commands
-- Test empty data handling
-- Test custom formatter functions
 
 ## Current Status
 The current `LogResult` implementation is functional but limited. The enhanced version will provide flexible, configurable logging that can adapt to different data types and user preferences while maintaining backward compatibility.
