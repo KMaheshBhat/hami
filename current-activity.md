@@ -140,121 +140,111 @@ export { BaseNode, Node, BatchNode, ParallelBatchNode, Flow, BatchFlow, Parallel
 
 ## Current Implementation Analysis
 
-### What We Have Now
+### What We Have Now (Working!)
+The current implementation successfully consolidates the dual-flow pattern into a single Flow using a clever `NodeFromConfigNode`:
+
 ```typescript
-// In handleFlowRun():
-// 1. First Flow: Static config retrieval
-const getFlow = new Flow(validateWorkingDirectory);
-// ... runs and gets config
+// Single Flow with dynamic node chaining:
+const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
+const coreConfigFSGet = registry.createNode("core-config-fs:get", {});
+const nodeFromConfig = new NodeFromConfigNode(); // The "glue" node
 
-// 2. Glue code: Dynamic instantiation
-if (!shared.configValue) return;
-const { kind, config } = shared.configValue;
-const flowNode = registry.createNode(kind, config);
+validateWorkingDirectory.next(coreConfigFSGet).next(nodeFromConfig);
 
-// 3. Second Flow: Dynamic execution
-const runFlow = new Flow(flowNode);
+const flow = new Flow(validateWorkingDirectory);
+await flow.run(shared);
 ```
+
+**How `NodeFromConfigNode` works:**
+- **prep()**: Extracts `{ kind, config }` from `shared.configValue` and calls `registry.createNode(kind, config)`
+- **post()**: Chains the dynamically created node as its successor using `this.next(prepRes)`
+
+This creates a single Flow that:
+1. Validates working directory
+2. Retrieves flow configuration
+3. Dynamically instantiates and chains the target flow/node
+4. Executes everything in one orchestrated flow
 
 ### The Pattern Opportunity
-Create a single wrapper Flow containing:
-1. **FlowRetrieverFlow**: Static sub-flow for config retrieval (PocketFlow Flow or HAMIFlow)
-2. **DynamicFlowRunnerNode**: Glue node that instantiates target flow
-3. **Dynamically loaded flow**: As the final successor
+The working implementation shows that the core pattern is already achieved! The remaining work is to extract this into a reusable `DynamicFlowRunnerFlow` class for better composability.
 
-## Proposed Architecture
+## Revised Architecture: DynamicRunnerNode as Flow
 
-### 1. FlowRetrieverFlow (PocketFlow Flow or HAMIFlow)
+### The Issue
+The current `DynamicRunnerNode` approach works but has a fundamental problem: it modifies the node graph dynamically during execution (`this.next(prepRes)`), which PocketFlow warns about. This violates the framework's expectation that the graph is static.
+
+### The Solution: DynamicRunnerNode as Flow
+Instead of a Node that manipulates successors, we need a **Flow** that contains the dynamic node as its start node, allowing proper orchestration.
+
+### Revised Architecture
+
+#### 1. DynamicRunnerFlow (PocketFlow Flow)
 ```typescript
-class FlowRetrieverFlow extends HAMIFlow<SharedContext> {
-  constructor(flowName: string) {
-    // Create a simple flow that retrieves config
-    const validateNode = new ValidateWorkingDirectoryNode();
-    const getConfigNode = new GetFlowConfigNode(flowName);
-
-    validateNode.next(getConfigNode);
-    super(validateNode);
+class DynamicRunnerFlow extends Flow {
+  constructor(registry: HAMIRegistrationManager) {
+    // This flow will dynamically set its start node
+    super(null as any); // We'll set start dynamically
   }
-}
 
-class GetFlowConfigNode extends HAMINode<SharedContext> {
-  constructor(private flowName: string) { super(); }
+  async prep(shared: Record<string, any>): Promise<Node | string> {
+    // Same logic as before: extract config and create node
+    if (!shared.configValue) return 'No config value found';
+    if (!shared.registry) return 'No registry found';
+    const { kind, config } = shared.configValue;
+    return shared.registry.createNode(kind, config);
+  }
 
-  kind(): string { return "flow:get-config"; }
+  async _run(shared: Record<string, any>): Promise<string | undefined> {
+    const dynamicNode = await this.prep(shared);
+    if (typeof dynamicNode === 'string') {
+      shared['dynamicRunnerError'] = dynamicNode;
+      return 'error';
+    }
 
-  async exec(): Promise<FlowConfig> {
-    // Retrieve flow config from registry/config
-    const config = await getFlowConfig(this.flowName);
-    return config; // { kind: "core-fs:copy-flow", config: {...} }
+    // Set the dynamic node as our start and run
+    this.start = dynamicNode;
+    return await super._run(shared);
   }
 }
 ```
 
-### 2. DynamicFlowRunnerNode
+#### 2. Updated Flow Chain
 ```typescript
-class DynamicFlowRunnerNode extends HAMINode<SharedContext> {
-  constructor(private registry: HAMIRegistrationManager) { super(); }
+// Instead of: validate -> getConfig -> runnerNode -> trace -> log -> results
+// We have:    validate -> getConfig -> runnerFlow -> results
 
-  kind(): string { return "flow:dynamic-runner"; }
+const runnerFlow = new DynamicRunnerFlow(registry);
+const logResults = new LogResult("results");
 
-  async prep(shared: SharedContext): Promise<FlowConfig> {
-    // FlowRetrieverNode puts config in shared context
-    return shared.flowConfig;
-  }
-
-  async exec(flowConfig: FlowConfig): Promise<HAMINode> {
-    // Instantiate the target flow dynamically
-    return this.registry.createNode(flowConfig.kind, flowConfig.config);
-  }
-
-  async post(shared: SharedContext, prepRes: FlowConfig, execRes: HAMINode): Promise<string> {
-    // Set up the dynamic flow as successor
-    this.next(execRes);
-    return "default";
-  }
-}
+validate.next(getConfig).next(runnerFlow).next(logResults);
 ```
 
-### 3. Composite DynamicFlowRunner Flow
-```typescript
-class DynamicFlowRunnerFlow extends HAMIFlow<SharedContext> {
-  constructor(registry: HAMIRegistrationManager, flowName: string) {
-    const flowRetriever = new FlowRetrieverNode();
-    const dynamicRunner = new DynamicFlowRunnerNode(registry);
+### Benefits of Flow-based Approach
 
-    // Chain: retriever -> runner -> dynamic flow
-    flowRetriever.next(dynamicRunner);
+1. **Framework Compliance**: No dynamic graph modification during execution
+2. **Proper Orchestration**: PocketFlow handles the dynamic node execution correctly
+3. **Clean Separation**: The Flow encapsulates the dynamic behavior
+4. **Composable**: Can be used anywhere a Flow is expected
+5. **Testable**: Easier to test Flow orchestration vs node manipulation
 
-    super(flowRetriever);
-    this.config = { flowName, registry };
-  }
-}
-```
+### Implementation Plan
 
-## Benefits
+#### Phase 1: Convert DynamicRunnerNode to DynamicRunnerFlow
+1. Change from extending `Node` to extending `Flow`
+2. Move dynamic logic from `prep/post` to Flow's `_run` method
+3. Update constructor and error handling
 
-1. **Single Flow Instance**: Eliminates glue code between separate flows
-2. **Reusable Pattern**: Can be used for any dynamic flow execution scenario
-3. **Better Composition**: Leverages PocketFlow's node chaining naturally
-4. **Testability**: Each component can be tested independently
-5. **Extensibility**: Easy to add pre/post processing nodes
+#### Phase 2: Update Flow Chaining
+1. Simplify the node chain in `handleFlowRun()`
+2. Remove complex successor manipulation
+3. Test that dynamic execution still works
 
-## Implementation Plan
+#### Phase 3: Extract to Reusable Component
+1. Move `DynamicRunnerFlow` to shared location
+2. Create `DynamicFlowRunnerFlow` wrapper if needed
+3. Update documentation
 
-### Phase 1: Core Components
-1. Create `FlowRetrieverNode` for config retrieval
-2. Create `DynamicFlowRunnerNode` for instantiation
-3. Create `DynamicFlowRunnerFlow` composite
+## Current Status
+The current implementation works but violates PocketFlow patterns. Converting to a Flow-based approach will be more maintainable and framework-compliant.
 
-### Phase 2: Refactor handleFlowRun()
-1. Replace dual-flow implementation with single `DynamicFlowRunnerFlow`
-2. Update CLI integration
-3. Test functionality
-
-### Phase 3: Pattern Extraction
-1. Make pattern configurable for different retrieval strategies
-2. Add support for flow parameters/payload injection
-3. Create base classes for similar patterns
-
-## Next Steps
-This refactoring would make the flow execution pattern more reusable and better aligned with PocketFlow's composition model. The current implementation works but this would provide a cleaner, more maintainable architecture.
+**Ready to implement the Flow-based solution!** 🔄

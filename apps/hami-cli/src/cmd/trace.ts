@@ -2,14 +2,14 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, ValidateErrorHandlerNode } from "./common.js";
+import { startContext, LogErrorNode } from "./common.js";
 
 export async function handleTraceList(
     registry: HAMIRegistrationManager,
     opts: Record<string, any>,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const coreTraceFSList = registry.createNode("core-trace-fs:list", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSList);
@@ -31,7 +31,7 @@ export async function handleTraceShow(
     traceId: string,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const coreTraceFSShow = registry.createNode("core-trace-fs:show", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSShow);
@@ -54,7 +54,7 @@ export async function handleTraceGrep(
     searchQuery: string,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const coreTraceFSGrep = registry.createNode("core-trace-fs:grep", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreTraceFSGrep);

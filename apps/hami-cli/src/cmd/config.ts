@@ -2,7 +2,7 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, ValidateErrorHandlerNode } from "./common.js";
+import { startContext, LogErrorNode } from "./common.js";
 
 export async function handleConfigList(
     registry: HAMIRegistrationManager,
@@ -10,7 +10,7 @@ export async function handleConfigList(
     inPayload: Record<string, any>,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const coreConfigFSGetAll = registry.createNode("core-config-fs:get-all", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreConfigFSGetAll);
@@ -33,7 +33,7 @@ export async function handleConfigGet(
     inPayload: Record<string, any>,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const coreConfigFSGet = registry.createNode("core-config-fs:get", {});
     validateWorkingDirectory.on('error', validateErrorHandler);
     validateWorkingDirectory.next(coreConfigFSGet);
@@ -56,7 +56,7 @@ export async function handleConfigSet(
     inPayload: Record<string, any>,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const traceDataInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',
@@ -85,7 +85,7 @@ export async function handleConfigRemove(
     inPayload: Record<string, any>,
 ) {
     const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-    const validateErrorHandler = new ValidateErrorHandlerNode();
+    const validateErrorHandler = new LogErrorNode('directoryValidationErrors');
     const traceDataInject = registry.createNode("core-trace-fs:inject", {
         executor: 'cli',
         command: 'config',

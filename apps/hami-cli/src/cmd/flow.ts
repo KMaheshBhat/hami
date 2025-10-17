@@ -2,7 +2,7 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, ValidateErrorHandlerNode } from "./common.js";
+import { DynamicRunnerNode, startContext, LogErrorNode, LogResult, DynamicRunnerFlow } from "./common.js";
 
 export interface FlowOptions {
   verbose: boolean;
@@ -17,7 +17,7 @@ export async function handleFlowInit(
   config: Record<string, any>
 ): Promise<void> {
   const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-  const validateErrorHandler = new ValidateErrorHandlerNode();
+  const validateErrorHandler = new LogErrorNode("directoryValidationErrors");
   const traceDataInject = registry.createNode("core-trace-fs:inject", {
     executor: 'cli',
     command: 'flow',
@@ -48,59 +48,31 @@ export async function handleFlowRun(
   name: string,
   payload?: Record<string, any>
 ): Promise<void> {
-  // First step: Get the flow configuration
-  const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-  const validateErrorHandler = new ValidateErrorHandlerNode();
-  const coreConfigFSGet = registry.createNode("core-config-fs:get", {});
-  validateWorkingDirectory.on('error', validateErrorHandler);
-  validateWorkingDirectory.next(coreConfigFSGet);
-  const shared: Record<string, any> = {
+  const validate = registry.createNode("core-fs:validate-hami", {});
+  validate.on('error', new LogErrorNode("directoryValidationErrors"))
+  const getConfig = registry.createNode("core-config-fs:get", {});
+  const runner = new DynamicRunnerFlow({ runnerConfigValueKey: 'configValue' });
+  runner.on('error', new LogErrorNode("dynamicRunnerError"));
+  const traceInject = registry.createNode("core-trace-fs:inject", {
+    executor: 'cli',
+    command: 'flow',
+    operation: 'run',
+    target: opts.global ? 'global' : 'local',
+    name: `flow:${name}`,
+  });
+  const traceLog = registry.createNode("core-trace-fs:log", {});
+  const logResults = new LogResult("results");
+  validate.next(getConfig).next(runner).next(traceInject).next(traceLog).next(logResults);
+  const flow = new Flow(validate);
+  await flow.run({
+    registry: registry,
     coreFSStrategy: 'CWD',
     opts: opts,
     ...startContext(),
     target: opts.global ? 'global' : 'local',
     configKey: `flow:${name}`,
-  };
-  const getFlow = new Flow(validateWorkingDirectory);
-  await getFlow.run(shared);
-
-  if (!shared.configValue) {
-    console.log(`Flow '${name}' not found.`);
-    return;
-  }
-
-  const { kind, config } = shared.configValue;
-  opts.verbose && console.log(`Running flow: ${name}, kind: ${kind}, config:`, config, `payload:`, payload);
-
-  // Create and run the actual flow
-  const flowNode = registry.createNode(kind, config);
-  const flowErrorHandler = new ValidateErrorHandlerNode();
-  const traceDataInject = registry.createNode("core-trace-fs:inject", {
-    executor: 'cli',
-    command: 'flow',
-    operation: 'run',
-    target: opts.global ? 'global' : 'local',
-    flowName: name,
-    flowKind: kind,
-    payload: payload,
+    ...payload,
   });
-  const coreTraceFSLog = registry.createNode("core-trace-fs:log", {});
-  flowNode.on('error', flowErrorHandler);
-  flowNode.next(traceDataInject).next(coreTraceFSLog);
-
-  const flowShared: Record<string, any> = {
-    coreFSStrategy: 'CWD',
-    opts: opts,
-    ...startContext(),
-    ...payload, // Spread payload into shared context
-  };
-
-  const runFlow = new Flow(flowNode);
-  await runFlow.run(flowShared);
-
-  if (flowShared.results) {
-    console.log('Flow results:', flowShared.results);
-  }
 }
 
 export async function handleFlowRemove(
@@ -109,7 +81,7 @@ export async function handleFlowRemove(
   name: string
 ): Promise<void> {
   const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-  const validateErrorHandler = new ValidateErrorHandlerNode();
+  const validateErrorHandler = new LogErrorNode("directoryValidationErrors");
   const traceDataInject = registry.createNode("core-trace-fs:inject", {
     executor: 'cli',
     command: 'flow',
@@ -137,7 +109,7 @@ export async function handleFlowList(
   opts: FlowOptions
 ): Promise<void> {
   const validateWorkingDirectory = registry.createNode("core-fs:validate-hami", {});
-  const validateErrorHandler = new ValidateErrorHandlerNode();
+  const validateErrorHandler = new LogErrorNode("directoryValidationErrors");
   const coreConfigFSGetAll = registry.createNode("core-config-fs:get-all", {});
   validateWorkingDirectory.on('error', validateErrorHandler);
   validateWorkingDirectory.next(coreConfigFSGetAll);
