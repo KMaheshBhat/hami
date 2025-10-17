@@ -14,6 +14,11 @@ export function startContext(): Record<string, any> {
   return context;
 }
 
+/**
+ * @deprecated Use EnhancedLogResult instead. This class is kept for backward compatibility
+ * but will be removed in a future version. EnhancedLogResult provides configurable
+ * output formats, prefixes, timestamps, and better data type handling.
+ */
 export class LogResult extends Node {
   private resultKey: string;
   constructor(resultKey: string) {
@@ -44,6 +49,111 @@ export class LogErrorNode extends Node {
       console.log('error(s):', prepRes);
     }
   }
+}
+export type LogFormat = 'generic' | 'table' | 'json' | 'custom';
+
+export interface LogResultConfig {
+  resultKey: string;
+  format?: LogFormat;
+  prefix?: string;
+  emptyMessage?: string;
+  includeTimestamp?: boolean;
+  customFormatter?: (data: any, context: LogContext) => string;
+  verbose?: boolean;
+}
+
+export interface LogContext {
+  timestamp: Date;
+  command?: string;
+  operation?: string;
+  metadata?: Record<string, any>;
+}
+
+export class EnhancedLogResult extends Node {
+  private config: LogResultConfig;
+  private context: LogContext;
+
+  constructor(config: LogResultConfig) {
+    super();
+    this.config = {
+      format: 'generic',
+      prefix: 'result(s):',
+      emptyMessage: 'No results found.',
+      includeTimestamp: false,
+      verbose: false,
+      ...config
+    };
+    this.context = {
+      timestamp: new Date(),
+      metadata: {}
+    };
+  }
+
+  async prep(shared: Record<string, any>): Promise<any | undefined> {
+    this.context.metadata = { ...shared };
+    return shared[this.config.resultKey];
+  }
+
+  async exec(prepRes: any | undefined): Promise<void> {
+    if (!prepRes) {
+      this.logEmptyResult();
+      return;
+    }
+
+    const formattedOutput = this.formatOutput(prepRes);
+    this.printOutput(formattedOutput);
+  }
+
+  private formatOutput(data: any): string {
+    const timestamp = this.config.includeTimestamp
+      ? `[${this.context.timestamp.toISOString()}] `
+      : '';
+
+    switch (this.config.format) {
+      case 'table':
+        return this.formatAsTable(data, timestamp);
+      case 'json':
+        return this.formatAsJson(data, timestamp);
+      case 'custom':
+        return this.config.customFormatter?.(data, this.context) || timestamp + String(data);
+      default:
+        return this.formatAsGeneric(data, timestamp);
+    }
+  }
+
+  private formatAsTable(data: any, timestamp: string): string {
+    if (Array.isArray(data) || typeof data === 'object') {
+      console.table(data);
+      return this.config.verbose ? timestamp + 'Results displayed as table' : '';
+    }
+    return this.formatAsGeneric(data, timestamp);
+  }
+
+  private formatAsJson(data: any, timestamp: string): string {
+    return timestamp + JSON.stringify(data, null, 2);
+  }
+
+  private formatAsGeneric(data: any, timestamp: string): string {
+    return timestamp + this.config.prefix + ' ' + String(data);
+  }
+
+  private logEmptyResult(): void {
+    if (this.config.verbose) {
+      console.log(this.config.emptyMessage || 'No results found.');
+    }
+  }
+
+  private printOutput(output: string): void {
+    console.log(output);
+  }
+}
+
+export function createTableLogger(resultKey: string, prefix: string) {
+  return new EnhancedLogResult({ resultKey, format: 'table', prefix });
+}
+
+export function createJsonLogger(resultKey: string, includeTimestamp = false) {
+  return new EnhancedLogResult({ resultKey, format: 'json', includeTimestamp });
 }
 
 type DynamicRunnerFlowConfig = {

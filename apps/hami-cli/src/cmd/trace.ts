@@ -2,7 +2,7 @@ import { Flow } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { startContext, LogErrorNode } from "./common.js";
+import { startContext, LogErrorNode, EnhancedLogResult } from "./common.js";
 
 export async function handleTraceList(
     registry: HAMIRegistrationManager,
@@ -12,18 +12,22 @@ export async function handleTraceList(
     validate
         .on('error', new LogErrorNode('directoryValidationErrors'));
     const listTraces = registry.createNode("core-trace-fs:list", {});
+    const logTraces = new EnhancedLogResult({
+        resultKey: "traceResults",
+        format: "table",
+        prefix: "Trace entries:",
+        emptyMessage: "No trace entries found.",
+        verbose: opts.verbose
+    });
     validate
-        .next(listTraces);
-    const shared: Record<string, any> = {
+        .next(listTraces)
+        .next(logTraces);
+    const flow = new Flow(validate);
+    await flow.run({
         coreFSStrategy: 'CWD',
         opts: opts,
         ...startContext(),
-    };
-    const flow = new Flow(validate);
-    await flow.run(shared);
-    if (shared.traceResults) {
-        console.table(shared.traceResults);
-    }
+    });
 }
 
 export async function handleTraceShow(
@@ -35,19 +39,23 @@ export async function handleTraceShow(
     validate
         .on('error', new LogErrorNode('directoryValidationErrors'));
     const showTrace = registry.createNode("core-trace-fs:show", {});
+    const logTrace = new EnhancedLogResult({
+        resultKey: "traceData",
+        format: "json",
+        prefix: "Trace data:",
+        includeTimestamp: true,
+        verbose: opts.verbose
+    });
     validate
-        .next(showTrace);
-    const shared: Record<string, any> = {
+        .next(showTrace)
+        .next(logTrace);
+    const flow = new Flow(validate);
+    await flow.run({
         coreFSStrategy: 'CWD',
         opts: opts,
         traceId: traceId,
         ...startContext(),
-    };
-    const flow = new Flow(validate);
-    await flow.run(shared);
-    if (shared.traceData) {
-        console.log(JSON.stringify(shared.traceData, null, 2));
-    }
+    });
 }
 
 export async function handleTraceGrep(

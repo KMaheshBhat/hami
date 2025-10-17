@@ -1,8 +1,8 @@
-import { Flow } from "pocketflow";
+import { Flow, Node } from "pocketflow";
 
 import { HAMIRegistrationManager } from "@hami/core";
 
-import { DynamicRunnerNode, startContext, LogErrorNode, LogResult, DynamicRunnerFlow } from "./common.js";
+import { DynamicRunnerNode, startContext, LogErrorNode, LogResult, DynamicRunnerFlow, EnhancedLogResult } from "./common.js";
 
 export interface FlowOptions {
     verbose: boolean;
@@ -65,7 +65,13 @@ export async function handleFlowRun(
         name: `flow:${name}`,
     });
     const traceLog = registry.createNode("core-trace-fs:log", {});
-    const logResults = new LogResult("results");
+    const logResults = new EnhancedLogResult({
+        resultKey: "results",
+        format: "table",
+        prefix: "Flow execution results:",
+        includeTimestamp: true,
+        verbose: opts.verbose
+    });
     validate
         .next(getConfig)
         .next(runner)
@@ -115,6 +121,37 @@ export async function handleFlowRemove(
     });
 }
 
+export class FilterFlowsNode extends Node {
+    async prep(shared: Record<string, any>): Promise<any | undefined> {
+        return shared.configValues;
+    }
+
+    async exec(prepRes: any | undefined): Promise<Record<string, any>> {
+        if (prepRes) {
+            // Filter for flow keys and transform the output
+            const flowConfigs: Record<string, any> = {};
+            Object.keys(prepRes).forEach(key => {
+                if (key.startsWith('flow:')) {
+                    const flowName = key.substring(5); // Remove 'flow:' prefix
+                    flowConfigs[flowName] = prepRes[key];
+                }
+            });
+            return flowConfigs;
+        } else {
+            return {};
+        }
+    }
+
+    async post(
+        shared: Record<string, any>, 
+        _prepRes: unknown,
+        execRes: unknown,
+    ): Promise<string | undefined> {
+        shared.flowConfigs = execRes;
+        return 'default';
+    }
+}
+
 export async function handleFlowList(
     registry: HAMIRegistrationManager,
     opts: FlowOptions
@@ -123,29 +160,23 @@ export async function handleFlowList(
     validate
         .on('error', new LogErrorNode("directoryValidationErrors"));
     const getAllConfig = registry.createNode("core-config-fs:get-all", {});
+    const filterFlows = new FilterFlowsNode();
+    const logFlows = new EnhancedLogResult({
+        resultKey: "flowConfigs",
+        format: "table",
+        prefix: "Configured flows:",
+        emptyMessage: "No flows configured.",
+        verbose: opts.verbose
+    });
     validate
-        .next(getAllConfig);
+        .next(getAllConfig)
+        .next(filterFlows)
+        .next(logFlows);
     const flow = new Flow(validate);
-    const shared: Record<string, any> = {
+    await flow.run({
         coreFSStrategy: 'CWD',
         opts: opts,
         ...startContext(),
         target: opts.global ? 'global' : 'local',
-    };
-    await flow.run(shared);
-    if (shared.configValues) {
-        // Filter for flow keys and transform the output
-        const flowConfigs: Record<string, any> = {};
-        Object.keys(shared.configValues).forEach(key => {
-            if (key.startsWith('flow:')) {
-                const flowName = key.substring(5); // Remove 'flow:' prefix
-                flowConfigs[flowName] = shared.configValues[key];
-            }
-        });
-        if (Object.keys(flowConfigs).length > 0) {
-            console.table(flowConfigs);
-        } else {
-            console.log('No flows configured.');
-        }
-    }
+    });
 }
