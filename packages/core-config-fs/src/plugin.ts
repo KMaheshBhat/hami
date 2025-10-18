@@ -1,5 +1,5 @@
 import { createPlugin } from "@hami/core";
-import { CoreConfigFSGetNode, CoreConfigFSGetAllNode, CoreConfigFSSetNode, CoreConfigFSRemoveNode } from "./operations/index.js";
+import { CoreConfigFSGetNode, CoreConfigFSGetAllNode, CoreConfigFSSetNode, CoreConfigFSRemoveNode } from "./ops/index.js";
 
 const CoreConfigFSPlugin = createPlugin(
     "core-config-fs",

@@ -1,5 +1,5 @@
 import { createPlugin, HAMIFlow } from "@hami/core";
-import { CoreFSCopyFlow, CoreFSCopyNode, InitWorkingDirectoryNode, ValidateNode } from "./operations/index.js";
+import { CoreFSCopyFlow, CoreFSCopyNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
 
 const CoreFSPlugin = createPlugin(
     "core-fs",

@@ -1,5 +1,5 @@
 import { createPlugin } from "@hami/core";
-import { CoreTraceFSInjectNode, CoreTraceFSLogNode, CoreTraceFSListNode, CoreTraceFSShowNode, CoreTraceFSGrepNode } from "./operations/index.js";
+import { CoreTraceFSInjectNode, CoreTraceFSLogNode, CoreTraceFSListNode, CoreTraceFSShowNode, CoreTraceFSGrepNode } from "./ops/index.js";
 
 const CoreTraceFSPlugin = createPlugin(
     "core-trace-fs",
