@@ -16,8 +16,8 @@ export interface ValidationResult {
  * Configuration schema for OpNode validation
  */
 export interface ValidationSchema {
-  /** Type of the value (string, number, boolean, object, array) */
-  type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+  /** Type of the value (string, number, boolean, object, array, any) */
+  type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'any';
   /** Whether the field is required (for non-objects) or list of required properties (for objects) */
   required?: boolean | string[];
   /** Default value if not provided */
@@ -71,7 +71,7 @@ export function validateAgainstSchema(
   }
 
   // Check type
-  if (value !== undefined && value !== null) {
+  if (value !== undefined && value !== null && schema.type !== 'any') {
     const actualType = Array.isArray(value) ? 'array' : typeof value;
     if (actualType !== schema.type) {
       errors.push(`${path || 'value'} must be of type ${schema.type}, got ${actualType}`);
@@ -95,6 +95,9 @@ export function validateAgainstSchema(
         break;
       case 'array':
         validateArray(value, schema, path, errors);
+        break;
+      case 'any':
+        // No validation for 'any' type
         break;
     }
   }
