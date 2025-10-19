@@ -263,7 +263,8 @@ let cmdFlow = new Command('flow')
       .argument('<name>', 'Flow name')
       .argument('<kind>', 'Flow kind')
       .argument('<config>', 'Flow configuration as JSON string')
-      .action(async (name: string, kind: string, config: string) => {
+      .argument('[resultKey]', 'Flow result key (optional)')
+      .action(async (name: string, kind: string, config: string, resultKey?: string) => {
         try {
           const isVerbose = !!program.opts().verbose;
           const isGlobal = !!cmdFlow.opts().global;
@@ -282,7 +283,11 @@ let cmdFlow = new Command('flow')
             ...startContext(),
             target: opts.global ? 'global' : 'local',
             configKey: `flow:${name}`,
-            configValue: { kind, config: parsedConfig },
+            configValue: { 
+              kind,
+              config: parsedConfig,
+              resultKey: resultKey || undefined,
+             },
           });
         } catch (error) {
           console.log('Error handling flow init command:', error);

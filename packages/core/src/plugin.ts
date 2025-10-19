@@ -1,5 +1,5 @@
 import { createPlugin } from "./registration.js";
-import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow } from "./ops/index.js";
+import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, MapNode, DebugNode } from "./ops/index.js";
 
 const CorePlugin = createPlugin(
     "@hami/core",
@@ -9,6 +9,8 @@ const CorePlugin = createPlugin(
         LogErrorNode as any,
         DynamicRunnerNode as any,
         DynamicRunnerFlow as any,
+        MapNode as any,
+        DebugNode as any,
     ],
     "HAMI Core Plugin - Fundamental nodes for logging and dynamic execution",
 );

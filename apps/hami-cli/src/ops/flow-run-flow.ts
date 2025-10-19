@@ -9,6 +9,7 @@ interface FlowRunFlowConfig {
     name: string;
     verbose: boolean;
     payload?: Record<string, any>;
+    resultKey?: string;
 }
 
 const FlowRunFlowConfigSchema: ValidationSchema = {
@@ -50,12 +51,10 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
 
     async run(shared: Record<string, any>): Promise<string | undefined> {
         assert(shared.registry, 'registry is required');
-        const validate = shared['registry'].createNode("core-fs:validate-hami", {});
-        validate
+        const validate = shared['registry'].createNode("core-fs:validate-hami", {})
             .on('error', shared['registry'].createNode('core:log-error', { errorKey: 'directoryValidationErrors' }))
         const getConfig = shared['registry'].createNode("core-config-fs:get", {});
-        const runner = shared['registry'].createNode('core:dynamic-runner-flow', { runnerConfigValueKey: 'configValue' });
-        runner
+        const runner = shared['registry'].createNode('core:dynamic-runner-flow', { runnerConfigValueKey: 'configValue' })
             .on('error', shared['registry'].createNode('core:log-error', { errorKey: 'dynamicRunnerError' }));
         const traceInject = shared['registry'].createNode("core-trace-fs:inject", {
             executor: 'cli',
@@ -65,6 +64,7 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
             name: `flow:${this.config.name}`,
         });
         const traceLog = shared['registry'].createNode("core-trace-fs:log", {});
+        const mapResults = shared['registry'].createNode("core:map", {});
         const logResults = shared['registry'].createNode("core:log-result", {
             resultKey: "results",
             format: "table",
@@ -78,6 +78,8 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
             .next(runner)
             .next(traceInject)
             .next(traceLog)
+            .next(new FlowRunResultMapConfigNode())
+            .next(mapResults)
             .next(logResults);
         return super.run(shared);
     }
@@ -88,5 +90,20 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
             valid: result.isValid,
             errors: result.errors || [],
         };
+    }
+}
+
+class FlowRunResultMapConfigNode extends Node<Record<string, any>> {
+    async prep(shared: Record<string, any>): Promise<Record<string, string>> {
+        if (!shared.configValue?.resultKey) {
+            return {};
+        }
+        return {
+            results: shared.configValue.resultKey,
+        }
+    }
+    async post(shared: Record<string, any>, prepRes: Record<string, string>, _execRes: unknown): Promise<string | undefined> {
+        shared.mapConfig = prepRes;
+        return 'default';
     }
 }

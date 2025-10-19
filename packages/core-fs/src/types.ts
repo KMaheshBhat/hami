@@ -17,6 +17,9 @@ type CoreFSSharedStorage = {
   copySourcePattern?: string;
   copyTargetDirectory?: string;
   copyResults?: string[];
+  readFilePath?: string;
+  readFileEncoding?: string;
+  readFileContent?: string;
   results?: any[];
 };
 
