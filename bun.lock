@@ -9,7 +9,7 @@
     },
     "apps/hami-cli": {
       "name": "@hami/hami-cli",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "bin": {
         "hami": "dist/index.js",
       },
@@ -28,7 +28,7 @@
     },
     "apps/hami-server": {
       "name": "@hami/hami-server",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@hami/core": "workspace:*",
         "hono": "^4.0.0",
@@ -40,7 +40,7 @@
     },
     "packages/core": {
       "name": "@hami/core",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "pocketflow": "^1.0.4",
       },
@@ -51,7 +51,7 @@
     },
     "packages/core-config-fs": {
       "name": "@hami/core-config-fs",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@hami/core": "workspace:*",
       },
@@ -62,7 +62,7 @@
     },
     "packages/core-fs": {
       "name": "@hami/core-fs",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@hami/core": "workspace:*",
         "glob": "^11.0.3",
@@ -75,7 +75,7 @@
     },
     "packages/core-trace-fs": {
       "name": "@hami/core-trace-fs",
-      "version": "1.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@hami/core": "workspace:*",
         "uuidv7": "^1.0.2",
