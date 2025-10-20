@@ -1,7 +1,7 @@
 {
   "name": "@hami/hami-server",
-  "version": "1.0.0",
-  "description": "Hami HTTP server application",
+  "version": "0.1.0",
+  "description": "HAMI HTTP server application",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

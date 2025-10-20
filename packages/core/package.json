@@ -1,7 +1,7 @@
 {
   "name": "@hami/core",
-  "version": "1.0.0",
-  "description": "Core library for Hami",
+  "version": "0.1.0",
+  "description": "Core library for HAMI",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
