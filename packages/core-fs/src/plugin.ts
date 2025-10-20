@@ -1,5 +1,5 @@
 import { createPlugin } from "@hami/core";
-import { CoreFSCopyNode, CoreFSReadFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
+import { CoreFSCopyNode, CoreFSReadFileNode, CoreFSWriteFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
 
 const CoreFSPlugin = createPlugin(
     "core-fs",
@@ -9,6 +9,7 @@ const CoreFSPlugin = createPlugin(
         ValidateNode as any,
         CoreFSCopyNode as any,
         CoreFSReadFileNode as any,
+        CoreFSWriteFileNode as any,
     ],
     "HAMI Core File System Plugin",
 );

@@ -79,7 +79,7 @@ class CoreFSReadFileNode extends HAMINode<CoreFSSharedStorage, CoreFSReadFileNod
     _prepRes: ReadFileNodeInput,
     execRes: ReadFileNodeOutput,
   ): Promise<string | undefined> {
-    shared.readFileContent = execRes;
+    shared.content = execRes;
     return "default";
   }
 }

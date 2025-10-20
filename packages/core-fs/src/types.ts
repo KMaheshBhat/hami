@@ -20,6 +20,8 @@ type CoreFSSharedStorage = {
   readFilePath?: string;
   readFileEncoding?: string;
   readFileContent?: string;
+  writeFileResult?: string;
+  content?: string;
   results?: any[];
 };
 
