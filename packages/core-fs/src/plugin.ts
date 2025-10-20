@@ -1,5 +1,5 @@
 import { createPlugin } from "@hami/core";
-import { CoreFSCopyNode, CoreFSReadFileNode, CoreFSWriteFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
+import { CoreFSCopyNode, CoreFSListDirectoryNode, CoreFSReadFileNode, CoreFSWriteFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
 
 const CoreFSPlugin = createPlugin(
     "core-fs",
@@ -8,6 +8,7 @@ const CoreFSPlugin = createPlugin(
         InitWorkingDirectoryNode as any,
         ValidateNode as any,
         CoreFSCopyNode as any,
+        CoreFSListDirectoryNode as any,
         CoreFSReadFileNode as any,
         CoreFSWriteFileNode as any,
     ],

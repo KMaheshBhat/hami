@@ -23,6 +23,7 @@ type CoreFSSharedStorage = {
   writeFileResult?: string;
   content?: string;
   results?: any[];
+  listDirectoryItems?: Array<{ name: string, path: string, type: 'file' | 'directory', size?: number, modified?: Date }>;
 };
 
 export {
