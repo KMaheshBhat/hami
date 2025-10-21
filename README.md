@@ -4,7 +4,7 @@ A modular, plugin-based framework for building human-agent workflows and machine
 
 ## Overview
 
-HAMI is a monorepo containing a core framework and applications for creating extensible workflows that bridge human interaction with machine execution. It provides a plugin architecture for registering custom nodes and flows, with built-in support for file system operations, configuration management, and tracing.
+HAMI is a monorepo containing a core framework and applications for creating extensible workflows that bridge human interaction with machine execution. It provides a plugin architecture for dynamically registering custom nodes and flows, with built-in support for file system operations, configuration management, and tracing.
 
 HAMI builds on top of [PocketFlow](https://github.com/The-Pocket/PocketFlow-Typescript), a lightweight TypeScript framework for creating expressive workflows and agent systems. PocketFlow provides the core workflow execution engine with support for multi-agent systems, RAG patterns, and agentic coding workflows, while HAMI extends it with a plugin system, CLI tools, and specialized components for human-agent interactions.
 
@@ -12,12 +12,12 @@ HAMI builds on top of [PocketFlow](https://github.com/The-Pocket/PocketFlow-Type
 
 ### Core Components
 
-- **@hami/core**: Core library providing the fundamental types, registration system, and base classes
-- **@hami/core-fs**: File system operations plugin
-- **@hami/core-config-fs**: Configuration management using file system storage
-- **@hami/core-trace-fs**: Operation tracing and logging plugin
-- **@hami/hami-cli**: Command-line interface for managing HAMI workflows
-- **@hami/hami-server**: HTTP server for programmatic access to HAMI functionality
+- **@hami/core**: Core library providing the fundamental types, registration system, and base classes ([`core/spec.md`](openspec/specs/core/spec.md))
+- **@hami/core-fs**: File system operations plugin ([`core-fs/spec.md`](openspec/specs/core-fs/spec.md))
+- **@hami/core-config-fs**: Configuration management using file system storage ([`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md))
+- **@hami/core-trace-fs**: Operation tracing and logging plugin ([`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md))
+- **@hami/hami-cli**: Command-line interface for managing HAMI workflows ([`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md))
+- **@hami/hami-server**: HTTP server for programmatic access to HAMI functionality ([`hami-server/spec.md`](openspec/specs/hami-server/spec.md))
 
 ### Key Concepts
 
@@ -60,7 +60,7 @@ bun run cli:install
 
 ### CLI
 
-The HAMI CLI provides commands for managing workflows, configuration, and tracing.
+The HAMI CLI provides commands for managing workflows, configuration, and tracing. See [`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md) for detailed command requirements and scenarios.
 
 #### Initialize a HAMI project
 ```bash
@@ -109,9 +109,11 @@ hami trace show <trace-id>
 hami trace grep "search query"
 ```
 
+*Note: Traces are identified using unique UUIDv7 identifiers for temporal ordering and efficient indexing.*
+
 ### Server
 
-The HAMI server provides HTTP endpoints for programmatic access.
+The HAMI server provides a RESTful HTTP API for programmatic access, built with the Hono framework and structured for future API expansion. See [`hami-server/spec.md`](openspec/specs/hami-server/spec.md) for detailed API requirements and endpoint specifications.
 
 ```bash
 # Start the development server
@@ -166,6 +168,16 @@ const MyPlugin = createPlugin(
   'My custom plugin description'
 );
 ```
+
+## Specifications
+
+For detailed technical specifications of each component, see the [`openspec/specs/`](openspec/specs/) directory:
+- [`core/spec.md`](openspec/specs/core/spec.md) - Core plugin system architecture
+- [`core-fs/spec.md`](openspec/specs/core-fs/spec.md) - File system operations
+- [`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md) - Configuration management
+- [`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md) - Trace logging and retrieval
+- [`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md) - Command-line interface
+- [`hami-server/spec.md`](openspec/specs/hami-server/spec.md) - HTTP API server
 
 ## Contributing
 
