@@ -2,6 +2,7 @@
   "name": "@hami/hami-server",
   "version": "0.1.0",
   "description": "HAMI HTTP server application",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

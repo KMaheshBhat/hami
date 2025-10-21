@@ -189,7 +189,7 @@ For detailed technical specifications of each component, see the [`openspec/spec
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Contact
 

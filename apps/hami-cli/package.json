@@ -2,6 +2,7 @@
   "name": "@hami/hami-cli",
   "version": "0.1.0",
   "description": "HAMI CLI application",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "bin": {

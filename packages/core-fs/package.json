@@ -2,6 +2,7 @@
   "name": "@hami/core-fs",
   "version": "0.1.0",
   "description": "Core File System library for HAMI",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

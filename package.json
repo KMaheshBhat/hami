@@ -1,6 +1,8 @@
 {
   "name": "hami-monorepo",
   "version": "0.1.0",
+  "description": "Monorepo for HAMI",
+  "license": "MIT",
   "private": true,
   "workspaces": [
     "apps/*",
