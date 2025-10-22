@@ -1,12 +1,44 @@
 /**
  * HAMI Plugin Registration System
+ *
+ * This module provides the core plugin architecture for HAMI (Human Agent Machine Interface).
+ * It enables dynamic loading and management of HAMINode and HAMIFlow classes through a plugin system,
+ * allowing for extensible workflow capabilities.
+ *
+ * Key Features:
+ * - Plugin-based architecture for modular node registration
+ * - Event-driven registration lifecycle
+ * - Type-safe node instantiation
+ * - Category-based node discovery
+ *
  * @packageDocumentation
  */
 
 import { HAMIFlow, HAMINode } from './types.js';
 
 /**
- * Plugin interface for dynamic HAMINode loading
+ * Plugin interface for dynamic HAMINode loading.
+ *
+ * Plugins encapsulate collections of related node classes and provide lifecycle management.
+ * They enable modular extension of HAMI's capabilities without modifying core code.
+ *
+ * Example implementation:
+ * ```typescript
+ * const myPlugin: HAMIPlugin = {
+ *   name: "my-custom-plugin",
+ *   version: "1.0.0",
+ *   description: "Custom nodes for specialized workflows",
+ *   async initialize() {
+ *     // Setup plugin resources
+ *   },
+ *   async getNodeClasses() {
+ *     return [MyCustomNode, MyCustomFlow];
+ *   },
+ *   async destroy() {
+ *     // Cleanup plugin resources
+ *   }
+ * };
+ * ```
  */
 export interface HAMIPlugin {
   /** Plugin name */
@@ -34,8 +66,28 @@ export type RegistrationEvent = 'beforeRegister' | 'afterRegister' | 'beforeUnre
 export type RegistrationEventHandler = (event: RegistrationEvent, nodeClass: typeof HAMINode | typeof HAMIFlow) => void | Promise<void>;
 
 /**
- * HAMI Registration Manager
- * Manages registration and instantiation of HAMINode and HAMIFlow classes
+ * HAMI Registration Manager - Central registry for nodes and plugins.
+ *
+ * This class manages the lifecycle of HAMINode and HAMIFlow classes, providing:
+ * - Registration and unregistration of individual node classes
+ * - Plugin management with automatic node class registration
+ * - Event-driven architecture for registration lifecycle hooks
+ * - Type-safe node instantiation with configuration validation
+ * - Category-based node discovery and filtering
+ *
+ * Usage:
+ * ```typescript
+ * const manager = new HAMIRegistrationManager();
+ *
+ * // Register a plugin
+ * await manager.registerPlugin(myPlugin);
+ *
+ * // Create a node instance
+ * const node = manager.createNode('my-plugin:custom-node', { config: 'value' });
+ *
+ * // Get nodes by category
+ * const loggingNodes = manager.getNodeClassesByCategory('logging');
+ * ```
  */
 export class HAMIRegistrationManager {
   private nodeClasses = new Map<string, typeof HAMINode | typeof HAMIFlow>();
@@ -76,7 +128,14 @@ export class HAMIRegistrationManager {
   }
 
   /**
-   * Register a HAMINode or HAMIFlow class
+   * Register a HAMINode or HAMIFlow class.
+   *
+   * Creates a temporary instance to determine the node's kind identifier,
+   * then stores the class for later instantiation. Emits 'beforeRegister'
+   * and 'afterRegister' events.
+   *
+   * @param nodeClass The node class constructor to register
+   * @throws Error if registration fails or node kind cannot be determined
    */
   async registerNodeClass(nodeClass: typeof HAMINode | typeof HAMIFlow): Promise<void> {
     // Create a dummy instance to get the kind (without config to avoid validation)
@@ -114,7 +173,23 @@ export class HAMIRegistrationManager {
   }
 
   /**
-   * Create a node instance from registered class
+   * Create a node instance from a registered class.
+   *
+   * Instantiates a node using the registered class constructor with the provided
+   * configuration. The constructor handles config validation automatically.
+   *
+   * @param kind The node kind identifier (e.g., 'core:debug', 'my-plugin:custom')
+   * @param config Optional configuration object passed to the node constructor
+   * @param maxRetries Optional maximum retry attempts for node execution
+   * @param wait Optional wait time between retries in milliseconds
+   * @returns A new instance of the requested node type
+   * @throws Error if no node class is registered for the given kind
+   *
+   * @example
+   * ```typescript
+   * const debugNode = manager.createNode('core:debug');
+   * const customNode = manager.createNode('my-plugin:processor', { input: 'data' }, 3, 1000);
+   * ```
    */
   createNode(kind: string, config?: any, maxRetries?: number, wait?: number): HAMINode | HAMIFlow {
     const nodeClass = this.getNodeClass(kind);
@@ -134,7 +209,19 @@ export class HAMIRegistrationManager {
   }
 
   /**
-   * Get node classes by category
+   * Get node classes by category.
+   *
+   * Filters registered node classes based on their kind prefix.
+   * Node kinds use colon-separated namespaces (e.g., 'core:debug', 'fs:read-file').
+   *
+   * @param category The category prefix to filter by (e.g., 'core', 'fs', 'logging')
+   * @returns Array of node classes matching the category
+   *
+   * @example
+   * ```typescript
+   * const coreNodes = manager.getNodeClassesByCategory('core');
+   * // Returns [DebugNode, LogResultNode, MapNode, ...]
+   * ```
    */
   getNodeClassesByCategory(category: string): (typeof HAMINode | typeof HAMIFlow)[] {
     return this.getAllNodeClasses().filter(nodeClass => {
@@ -151,7 +238,20 @@ export class HAMIRegistrationManager {
   }
 
   /**
-   * Register a plugin
+   * Register a plugin and all its node classes.
+   *
+   * Initializes the plugin, retrieves its node classes, and registers each one.
+   * If initialization fails, automatically cleans up any allocated resources.
+   *
+   * @param plugin The plugin instance to register
+   * @throws Error if plugin is already registered or initialization fails
+   *
+   * @example
+   * ```typescript
+   * import { CorePlugin } from './packages/core/src/plugin.js';
+   *
+   * await manager.registerPlugin(CorePlugin);
+   * ```
    */
   async registerPlugin(plugin: HAMIPlugin): Promise<void> {
     // Check if plugin is already registered
@@ -257,12 +357,53 @@ export class HAMIRegistrationManager {
 
 
 /**
- * Global HAMI registration manager instance
+ * Global HAMI registration manager instance.
+ *
+ * This is the default registry instance used throughout HAMI applications.
+ * Most applications will use this singleton rather than creating their own
+ * HAMIRegistrationManager instances.
+ *
+ * Core plugins and custom plugins should be registered with this instance:
+ * ```typescript
+ * import { hamiRegistrationManager } from './registration.js';
+ * import { CorePlugin } from './packages/core/src/plugin.js';
+ *
+ * await hamiRegistrationManager.registerPlugin(CorePlugin);
+ * ```
  */
 export const hamiRegistrationManager = new HAMIRegistrationManager();
 
 /**
- * Helper function to create a simple plugin
+ * Helper function to create a simple plugin.
+ *
+ * Creates a basic plugin implementation with default initialize and destroy methods.
+ * Useful for plugins that don't need complex lifecycle management.
+ *
+ * @param name Unique plugin identifier (recommended format: '@scope/name')
+ * @param version Semantic version string
+ * @param nodeClasses Array of node classes or function returning a promise of node classes
+ * @param description Optional human-readable description
+ * @returns A HAMIPlugin instance
+ *
+ * @example
+ * ```typescript
+ * const myPlugin = createPlugin(
+ *   "@my-org/custom-nodes",
+ *   "1.0.0",
+ *   [CustomNode1, CustomNode2],
+ *   "Custom workflow nodes for specialized processing"
+ * );
+ *
+ * // Or with dynamic loading:
+ * const dynamicPlugin = createPlugin(
+ *   "@my-org/dynamic-nodes",
+ *   "1.0.0",
+ *   async () => {
+ *     const modules = await import('./nodes/index.js');
+ *     return Object.values(modules);
+ *   }
+ * );
+ * ```
  */
 export function createPlugin(
   name: string,

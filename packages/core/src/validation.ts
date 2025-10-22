@@ -1,8 +1,24 @@
 /**
- * Validation utilities for schema-based validation
+ * Validation utilities for schema-based validation in HAMI.
+ *
+ * This module provides a flexible schema validation system for configuration objects
+ * used in HAMINode and HAMIFlow classes. It supports validation of primitive types,
+ * objects, arrays, and complex nested structures with customizable constraints.
+ *
+ * Key Features:
+ * - Type validation (string, number, boolean, object, array, any)
+ * - Constraint validation (required, min/max, pattern, enum)
+ * - Nested object and array validation
+ * - Default value support
+ * - Detailed error reporting with path information
+ *
  * @packageDocumentation
  */
 
+/**
+ * Result of a validation operation.
+ * Provides detailed feedback about validation success or failure.
+ */
 export interface ValidationResult {
   /** Whether the validation passed */
   isValid: boolean;
@@ -13,7 +29,24 @@ export interface ValidationResult {
 }
 
 /**
- * Configuration schema for OpNode validation
+ * Schema definition for validating configuration objects.
+ *
+ * Defines the structure and constraints for validating data objects used in HAMI nodes.
+ * Supports JSON Schema-like validation with additional features for HAMI-specific use cases.
+ *
+ * @example
+ * ```typescript
+ * const userConfigSchema: ValidationSchema = {
+ *   type: 'object',
+ *   required: ['name', 'email'],
+ *   properties: {
+ *     name: { type: 'string', minLength: 2, maxLength: 50 },
+ *     email: { type: 'string', pattern: '^[^@]+@[^@]+\\.[^@]+$' },
+ *     age: { type: 'number', minimum: 0, maximum: 150, default: 25 },
+ *     active: { type: 'boolean', default: true }
+ *   }
+ * };
+ * ```
  */
 export interface ValidationSchema {
   /** Type of the value (string, number, boolean, object, array, any) */
@@ -43,11 +76,30 @@ export interface ValidationSchema {
 }
 
 /**
- * Validate a value against a schema
- * @param value - The value to validate
- * @param schema - The validation schema
- * @param path - Current path in the object (for error reporting)
- * @returns ValidationResult object
+ * Validate a value against a validation schema.
+ *
+ * Performs comprehensive validation of a value against the provided schema,
+ * checking type, constraints, and nested structures. Returns detailed error
+ * information for failed validations.
+ *
+ * @param value - The value to validate (can be any type)
+ * @param schema - The validation schema defining expected structure and constraints
+ * @param path - Current path in the object hierarchy (used for error reporting, defaults to empty string)
+ * @returns ValidationResult with success status and any validation errors
+ *
+ * @example
+ * ```typescript
+ * const schema: ValidationSchema = {
+ *   type: 'object',
+ *   required: ['name'],
+ *   properties: { name: { type: 'string', minLength: 1 } }
+ * };
+ *
+ * const result = validateAgainstSchema({ name: 'John' }, schema);
+ * if (!result.isValid) {
+ *   console.log('Validation errors:', result.errors);
+ * }
+ * ```
  */
 export function validateAgainstSchema(
   value: any,
@@ -114,7 +166,15 @@ export function validateAgainstSchema(
 }
 
 /**
- * Validate a string value
+ * Validate a string value against string-specific schema constraints.
+ *
+ * Checks string length limits, pattern matching, and ensures the value is actually a string.
+ * Used internally by validateAgainstSchema for string type validation.
+ *
+ * @param value - The value to validate
+ * @param schema - The validation schema containing string constraints
+ * @param path - Current path for error reporting
+ * @param errors - Array to collect validation errors
  */
 function validateString(
   value: any,
@@ -149,7 +209,15 @@ function validateString(
 }
 
 /**
- * Validate a number value
+ * Validate a number value against numeric schema constraints.
+ *
+ * Checks minimum/maximum values and ensures the value is a valid number.
+ * Used internally by validateAgainstSchema for number type validation.
+ *
+ * @param value - The value to validate
+ * @param schema - The validation schema containing numeric constraints
+ * @param path - Current path for error reporting
+ * @param errors - Array to collect validation errors
  */
 function validateNumber(
   value: any,
@@ -172,7 +240,15 @@ function validateNumber(
 }
 
 /**
- * Validate a boolean value
+ * Validate a boolean value.
+ *
+ * Ensures the value is actually a boolean type.
+ * Used internally by validateAgainstSchema for boolean type validation.
+ *
+ * @param value - The value to validate
+ * @param schema - The validation schema (boolean constraints are minimal)
+ * @param path - Current path for error reporting
+ * @param errors - Array to collect validation errors
  */
 function validateBoolean(
   value: any,
@@ -186,7 +262,16 @@ function validateBoolean(
 }
 
 /**
- * Validate an object value
+ * Validate an object value against object schema constraints.
+ *
+ * Checks required properties and recursively validates nested properties
+ * according to their individual schemas. Used internally by validateAgainstSchema
+ * for object type validation.
+ *
+ * @param value - The object to validate
+ * @param schema - The validation schema containing object structure and property schemas
+ * @param path - Current path for error reporting
+ * @param errors - Array to collect validation errors
  */
 function validateObject(
   value: any,
@@ -220,7 +305,15 @@ function validateObject(
 }
 
 /**
- * Validate an array value
+ * Validate an array value against array schema constraints.
+ *
+ * Checks array length limits and validates each item against the item schema
+ * if provided. Used internally by validateAgainstSchema for array type validation.
+ *
+ * @param value - The array to validate
+ * @param schema - The validation schema containing array constraints and item schema
+ * @param path - Current path for error reporting
+ * @param errors - Array to collect validation errors
  */
 function validateArray(
   value: any,
