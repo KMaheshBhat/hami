@@ -12,12 +12,12 @@ HAMI builds on top of [PocketFlow](https://github.com/The-Pocket/PocketFlow-Type
 
 ### Core Components
 
-- **@hami/core**: Core library providing the fundamental types, registration system, and base classes ([`core/spec.md`](openspec/specs/core/spec.md))
-- **@hami/core-fs**: File system operations plugin ([`core-fs/spec.md`](openspec/specs/core-fs/spec.md))
-- **@hami/core-config-fs**: Configuration management using file system storage ([`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md))
-- **@hami/core-trace-fs**: Operation tracing and logging plugin ([`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md))
-- **@hami/hami-cli**: Command-line interface for managing HAMI workflows ([`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md))
-- **@hami/hami-server**: HTTP server for programmatic access to HAMI functionality ([`hami-server/spec.md`](openspec/specs/hami-server/spec.md))
+- **@hami-frameworx/core**: Core library providing the fundamental types, registration system, and base classes ([`core/spec.md`](openspec/specs/core/spec.md))
+- **@hami-frameworx/core-fs**: File system operations plugin ([`core-fs/spec.md`](openspec/specs/core-fs/spec.md))
+- **@hami-frameworx/core-config-fs**: Configuration management using file system storage ([`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md))
+- **@hami-frameworx/core-trace-fs**: Operation tracing and logging plugin ([`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md))
+- **@hami-frameworx/hami-cli**: Command-line interface for managing HAMI workflows ([`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md))
+- **@hami-frameworx/hami-server**: HTTP server for programmatic access to HAMI functionality ([`hami-server/spec.md`](openspec/specs/hami-server/spec.md))
 
 ### Key Concepts
 
@@ -154,7 +154,7 @@ bun run all:clean
 Plugins are created using the `createPlugin` helper function:
 
 ```typescript
-import { createPlugin, HAMINode } from '@hami/core';
+import { createPlugin, HAMINode } from '@hami-frameworx/core';
 
 class MyCustomNode extends HAMINode {
   kind() { return 'my:custom'; }

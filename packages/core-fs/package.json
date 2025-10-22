@@ -1,5 +1,5 @@
 {
-  "name": "@hami/core-fs",
+  "name": "@hami-frameworx/core-fs",
   "version": "0.1.0",
   "description": "Core File System library for HAMI",
   "license": "MIT",
@@ -16,7 +16,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@hami/core": "workspace:*",
+    "@hami-frameworx/core": "workspace:*",
     "glob": "^11.0.3"
   }
 }

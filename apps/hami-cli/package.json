@@ -1,5 +1,5 @@
 {
-  "name": "@hami/hami-cli",
+  "name": "@hami-frameworx/hami-cli",
   "version": "0.1.0",
   "description": "HAMI CLI application",
   "license": "MIT",
@@ -16,10 +16,10 @@
   "dependencies": {
     "commander": "^12.0.0",
     "pocketflow": "^1.0.4",
-    "@hami/core": "workspace:*",
-    "@hami/core-fs": "workspace:*",
-    "@hami/core-config-fs": "workspace:*",
-    "@hami/core-trace-fs": "workspace:*"
+    "@hami-frameworx/core": "workspace:*",
+    "@hami-frameworx/core-fs": "workspace:*",
+    "@hami-frameworx/core-config-fs": "workspace:*",
+    "@hami-frameworx/core-trace-fs": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

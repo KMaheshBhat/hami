@@ -1,7 +1,7 @@
 {
-  "name": "hami-monorepo",
+  "name": "hami-frameworx-monorepo",
   "version": "0.1.0",
-  "description": "Monorepo for HAMI",
+  "description": "Monorepo for HAMI FRAMEWORX",
   "license": "MIT",
   "private": true,
   "workspaces": [
@@ -12,7 +12,7 @@
     "cli:dev": "bun run --cwd apps/hami-cli dev",
     "cli:install": "bun run --cwd apps/hami-cli build && cd apps/hami-cli && npm install -g .",
     "server:dev": "bun run --cwd apps/hami-server dev",
-    "all:build": "bun run --filter=\"@hami/core\" build && bun run --filter=\"@hami/core-*\" build && bun run --filter=\"@hami/hami-*\" build",
+    "all:build": "bun run --filter=\"@hami-frameworx/core\" build && bun run --filter=\"@hami-frameworx/core-*\" build && bun run --filter=\"@hami-frameworx/hami-*\" build",
     "all:clean": "rm -rf apps/*/dist packages/*/dist"
   },
   "devDependencies": {
