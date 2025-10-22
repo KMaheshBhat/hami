@@ -1,6 +1,6 @@
 {
   "name": "@hami-frameworx/core-trace-fs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Core File System based Trace library for HAMI",
   "license": "MIT",
   "type": "module",
