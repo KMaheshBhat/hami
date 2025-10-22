@@ -6,11 +6,19 @@ import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, Validati
 
 import { CoreFSOpts, CoreFSSharedStorage } from '../types.js';
 
+/**
+ * Configuration interface for the CoreFSListDirectoryNode.
+ * Defines the directory path and recursion options for listing directory contents.
+ */
 type CoreFSListDirectoryNodeConfig = {
   path?: string;
   recursive?: boolean;
 };
 
+/**
+ * Validation schema for CoreFSListDirectoryNodeConfig.
+ * Ensures that the configuration contains optional path and recursive properties with defaults.
+ */
 const CoreFSListDirectoryNodeConfigSchema: ValidationSchema = {
   type: 'object',
   properties: {
@@ -19,6 +27,10 @@ const CoreFSListDirectoryNodeConfigSchema: ValidationSchema = {
   },
 };
 
+/**
+ * Input type for the list directory operation.
+ * Contains the resolved path, recursion flag, working directory, and options.
+ */
 type ListDirectoryNodeInput = {
   path: string;
   recursive: boolean;
@@ -26,13 +38,42 @@ type ListDirectoryNodeInput = {
   opts?: CoreFSOpts;
 };
 
+/**
+ * Output type for the list directory operation.
+ * An array of directory items with metadata including name, path, type, size, and modification date.
+ */
 type ListDirectoryNodeOutput = Array<{ name: string, path: string, type: 'file' | 'directory', size?: number, modified?: Date }>;
 
+/**
+ * CoreFSListDirectoryNode is a core file system operation node that lists the contents of a directory.
+ * It extends HAMINode and is used for directory listing operations in HAMI workflows.
+ *
+ * Configuration:
+ * - `path` (optional): The directory path to list (relative to working directory, defaults to '.').
+ * - `recursive` (optional): Whether to list contents recursively (defaults to false).
+ *
+ * Expected shared state inputs:
+ * - `shared.workingDirectory`: The base working directory for resolving relative paths.
+ * - `shared.opts`: Optional configuration including verbose logging flag.
+ *
+ * Expected shared state outputs:
+ * - `shared.listDirectoryItems`: An array of directory items with metadata including name, path, type, size, and modification date.
+ */
 class CoreFSListDirectoryNode extends HAMINode<CoreFSSharedStorage, CoreFSListDirectoryNodeConfig> {
+  /**
+   * Returns the kind identifier for this node, which is 'core-fs:list-directory'.
+   * @returns The string 'core-fs:list-directory'.
+   */
   kind(): string {
     return "core-fs:list-directory";
   }
 
+  /**
+   * Validates the provided configuration against the schema.
+   * Checks that path is a string and recursive is a boolean with appropriate defaults.
+   * @param config The configuration object to validate.
+   * @returns An object indicating if the config is valid and any validation errors.
+   */
   validateConfig(config: CoreFSListDirectoryNodeConfig): HAMINodeConfigValidateResult {
     const result = validateAgainstSchema(config, CoreFSListDirectoryNodeConfigSchema);
     return {
@@ -41,6 +82,13 @@ class CoreFSListDirectoryNode extends HAMINode<CoreFSSharedStorage, CoreFSListDi
     };
   }
 
+  /**
+   * Prepares the input parameters for the directory listing operation.
+   * Merges configuration from node config and shared state, resolves the directory path,
+   * and sets up the working directory and options.
+   * @param shared The shared data object containing working directory and options.
+   * @returns A promise that resolves to the prepared input parameters.
+   */
   async prep(
     shared: CoreFSSharedStorage,
   ): Promise<ListDirectoryNodeInput> {
@@ -59,6 +107,13 @@ class CoreFSListDirectoryNode extends HAMINode<CoreFSSharedStorage, CoreFSListDi
     };
   }
 
+  /**
+   * Executes the directory listing operation by reading the directory contents synchronously.
+   * Supports recursive listing and collects metadata for each item including name, path, type, size, and modification date.
+   * Handles errors for non-existent directories and logs verbose output if enabled.
+   * @param params The prepared input parameters containing path, recursive flag, and options.
+   * @returns A promise that resolves to an array of directory items with metadata.
+   */
   async exec(
     params: ListDirectoryNodeInput,
   ): Promise<ListDirectoryNodeOutput> {
@@ -101,6 +156,14 @@ class CoreFSListDirectoryNode extends HAMINode<CoreFSSharedStorage, CoreFSListDi
     return items;
   }
 
+  /**
+   * Handles post-execution logic by storing the directory listing results in the shared state.
+   * Sets the listDirectoryItems property in shared storage for use by subsequent nodes.
+   * @param shared The shared data object to update with results.
+   * @param _prepRes The prepared input parameters (unused in this implementation).
+   * @param execRes The execution results containing the directory items array.
+   * @returns A promise that resolves to 'default' to continue normal flow.
+   */
   async post(
     shared: CoreFSSharedStorage,
     _prepRes: ListDirectoryNodeInput,
