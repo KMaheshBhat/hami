@@ -1,7 +1,7 @@
 import { Node } from "pocketflow";
 
-import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from "@hami/core";
-import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami/core-trace-fs";
+import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from "@hami-frameworx/core";
+import { CoreTraceFSInjectNode, CoreTraceFSLogNode } from "@hami-frameworx/core-trace-fs";
 import assert from "assert";
 
 interface InitFlowConfig {

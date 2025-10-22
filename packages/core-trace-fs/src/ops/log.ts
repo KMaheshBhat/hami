@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { uuidv7 } from 'uuidv7';
 
-import { HAMINode } from "@hami/core";
+import { HAMINode } from "@hami-frameworx/core";
 
 import { CoreTraceFSOpts, CoreTraceFSStorage } from "../types.js";
 import { fetchTraceIndex, writeTraceIndex } from "./common.js";

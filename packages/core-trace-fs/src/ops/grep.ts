@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { HAMINode } from "@hami/core";
+import { HAMINode } from "@hami-frameworx/core";
 
 import { CoreTraceFSOpts, CoreTraceFSStorage } from "../types.js";
 import { fetchTraceIndex } from "./common.js";

@@ -2,7 +2,7 @@ import assert from 'assert';
 import { readdirSync, statSync } from 'fs';
 import { join } from 'path';
 
-import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami/core';
+import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami-frameworx/core';
 
 import { CoreFSOpts, CoreFSSharedStorage } from '../types.js';
 

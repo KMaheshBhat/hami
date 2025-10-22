@@ -1,6 +1,6 @@
 import { Node } from "pocketflow";
 
-import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from "@hami/core";
+import { HAMIFlow, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from "@hami-frameworx/core";
 import assert from "assert";
 
 interface TraceListFlowConfig {

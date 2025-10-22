@@ -1,4 +1,4 @@
-import { createPlugin } from "@hami/core";
+import { createPlugin } from "@hami-frameworx/core";
 import { CoreFSCopyNode, CoreFSListDirectoryNode, CoreFSReadFileNode, CoreFSWriteFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
 
 const CoreFSPlugin = createPlugin(

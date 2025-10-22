@@ -24,5 +24,8 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
-  }
+  },
+  "keywords": [],
+  "author": "",
+  "types": "./dist/index.d.ts"
 }

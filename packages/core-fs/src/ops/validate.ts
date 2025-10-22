@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-import { HAMINode } from "@hami/core";
+import { HAMINode } from "@hami-frameworx/core";
 
 import { CoreFSOpts, CoreFSSharedStorage } from "../types.js";
 

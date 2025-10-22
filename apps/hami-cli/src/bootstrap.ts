@@ -1,7 +1,7 @@
-import { CoreFSPlugin } from '@hami/core-fs';
-import { CoreConfigFSPlugin } from '@hami/core-config-fs';
-import { CoreTraceFSPlugin } from '@hami/core-trace-fs';
-import { HAMIRegistrationManager, CorePlugin } from '@hami/core';
+import { CoreFSPlugin } from '@hami-frameworx/core-fs';
+import { CoreConfigFSPlugin } from '@hami-frameworx/core-config-fs';
+import { CoreTraceFSPlugin } from '@hami-frameworx/core-trace-fs';
+import { HAMIRegistrationManager, CorePlugin } from '@hami-frameworx/core';
 
 export async function bootstrap(): Promise<{ registry: HAMIRegistrationManager }> {
     const registry = new HAMIRegistrationManager();

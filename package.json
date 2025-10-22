@@ -13,7 +13,8 @@
     "cli:install": "bun run --cwd apps/hami-cli build && cd apps/hami-cli && npm install -g .",
     "server:dev": "bun run --cwd apps/hami-server dev",
     "all:build": "bun run --filter=\"@hami-frameworx/core\" build && bun run --filter=\"@hami-frameworx/core-*\" build && bun run --filter=\"@hami-frameworx/hami-*\" build",
-    "all:clean": "rm -rf apps/*/dist packages/*/dist"
+    "all:clean": "rm -rf apps/*/dist packages/*/dist",
+    "node_modules:clean": "rm -rf apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

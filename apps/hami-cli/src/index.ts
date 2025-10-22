@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { homedir } from 'os';
 import { join as pathJoin } from 'path';
 
-import { CoreFSOpts } from "@hami/core-fs";
+import { CoreFSOpts } from "@hami-frameworx/core-fs";
 
 import packageJson from '../package.json' with { type: 'json' };
 import { bootstrap } from './bootstrap.js';

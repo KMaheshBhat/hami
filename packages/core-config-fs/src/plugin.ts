@@ -1,4 +1,4 @@
-import { createPlugin } from "@hami/core";
+import { createPlugin } from "@hami-frameworx/core";
 import { CoreConfigFSGetNode, CoreConfigFSGetAllNode, CoreConfigFSSetNode, CoreConfigFSRemoveNode } from "./ops/index.js";
 
 const CoreConfigFSPlugin = createPlugin(

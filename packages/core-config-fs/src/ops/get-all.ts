@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { join } from "path";
 
-import { HAMINode } from "@hami/core";
+import { HAMINode } from "@hami-frameworx/core";
 
 import { CoreConfigFSOpts, CoreConfigFSStorage } from "../types.js";
 import { CONFIG_FILE_NAME, fetchConfig, USER_CONFIG_FILE_NAME } from "./common.js";

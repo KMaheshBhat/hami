@@ -3,7 +3,7 @@ import { sync as globSync } from 'glob';
 import { promises as fs } from 'fs';
 import { join, dirname, relative } from 'path';
 
-import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami/core';
+import { HAMINode, HAMINodeConfigValidateResult, validateAgainstSchema, ValidationSchema } from '@hami-frameworx/core';
 
 import { CoreFSOpts, CoreFSSharedStorage } from '../types.js';
 

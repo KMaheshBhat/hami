@@ -1,4 +1,4 @@
-import { createPlugin } from "@hami/core";
+import { createPlugin } from "@hami-frameworx/core";
 import { CoreTraceFSInjectNode, CoreTraceFSLogNode, CoreTraceFSListNode, CoreTraceFSShowNode, CoreTraceFSGrepNode } from "./ops/index.js";
 
 const CoreTraceFSPlugin = createPlugin(
