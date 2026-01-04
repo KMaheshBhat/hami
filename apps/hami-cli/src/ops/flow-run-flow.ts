@@ -64,7 +64,7 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
             name: `flow:${this.config.name}`,
         });
         const traceLog = shared['registry'].createNode("core-trace-fs:log", {});
-        const mapResults = shared['registry'].createNode("core:map", {});
+        const assignResults = shared['registry'].createNode("core:assign", {});
         const logResults = shared['registry'].createNode("core:log-result", {
             resultKey: "results",
             format: "table",
@@ -78,8 +78,8 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
             .next(runner)
             .next(traceInject)
             .next(traceLog)
-            .next(new FlowRunResultMapConfigNode())
-            .next(mapResults)
+            .next(new FlowRunResultAssignConfigNode())
+            .next(assignResults)
             .next(logResults);
         return super.run(shared);
     }
@@ -93,7 +93,7 @@ export class FlowRunFlow extends HAMIFlow<Record<string, any>, FlowRunFlowConfig
     }
 }
 
-class FlowRunResultMapConfigNode extends Node<Record<string, any>> {
+class FlowRunResultAssignConfigNode extends Node<Record<string, any>> {
     async prep(shared: Record<string, any>): Promise<Record<string, string>> {
         if (!shared.configValue?.resultKey) {
             return {};
@@ -103,7 +103,7 @@ class FlowRunResultMapConfigNode extends Node<Record<string, any>> {
         }
     }
     async post(shared: Record<string, any>, prepRes: Record<string, string>, _execRes: unknown): Promise<string | undefined> {
-        shared.mapConfig = prepRes;
+        shared.assignConfig = prepRes;
         return 'default';
     }
 }

@@ -8,7 +8,7 @@
  */
 
 import { createPlugin } from "./registration.js";
-import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, MapNode, DebugNode } from "./ops/index.js";
+import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, AssignNode, DebugNode } from "./ops/index.js";
 
 /**
  * The HAMI Core Plugin instance.
@@ -18,7 +18,7 @@ import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, MapN
  * - `LogErrorNode` ('core:log-error'): Logs error information from shared state
  * - `DynamicRunnerNode` ('core:dynamic-runner'): Dynamically creates and runs nodes based on configuration
  * - `DynamicRunnerFlow` ('core:dynamic-runner-flow'): Flow wrapper for dynamic node execution
- * - `MapNode` ('core:map'): Maps and transforms properties in shared state using dot-notation paths
+ * - `AssignNode` ('core:assign'): Assigns and transforms properties in shared state using dot-notation paths
  * - `DebugNode` ('core:debug'): Logs the entire shared state for debugging purposes
  *
  * To use this plugin, register it with a HAMIRegistrationManager:
@@ -37,7 +37,7 @@ const CorePlugin = createPlugin(
         LogErrorNode as any,
         DynamicRunnerNode as any,
         DynamicRunnerFlow as any,
-        MapNode as any,
+        AssignNode as any,
         DebugNode as any,
     ],
     "HAMI Core Plugin - Fundamental nodes for logging and dynamic execution",

@@ -39,7 +39,7 @@ This package provides the following core node types:
 - **`core:debug`**: Logs the entire shared state for debugging
 - **`core:log-result`**: Logs result data with various formatting options (table, JSON, generic)
 - **`core:log-error`**: Logs error information from shared state
-- **`core:map`**: Maps properties from shared state using dot-notation paths
+- **`core:assign`**: Assigns properties from shared state using dot-notation paths
 - **`core:dynamic-runner`**: Dynamically creates and runs nodes based on configuration
 - **`core:dynamic-runner-flow`**: Flow wrapper for dynamic node execution
 
