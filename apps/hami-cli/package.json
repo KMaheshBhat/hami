@@ -1,6 +1,6 @@
 {
   "name": "@hami-frameworx/hami-cli",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "HAMI CLI application",
   "license": "MIT",
   "type": "module",

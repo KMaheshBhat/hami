@@ -60,9 +60,9 @@ export class AssignNode extends HAMINode<Record<string, any>, AssignNodeConfig> 
      * @param _execRes The execution result (unused in this implementation).
      * @returns A promise that resolves to 'default' to continue normal flow.
      */
-    async post(shared: Record<string, any>, prepRes: Record<string, any>, _execRes: unknown): Promise<string | undefined> {
-        for (const [outputKey, outputValue] of Object.entries(prepRes)) {
-            shared[outputKey] = outputValue;
+    async post(shared: Record<string, any>, prepRes: Record<string, any>): Promise<string | undefined> {
+        for (const [targetPath, value] of Object.entries(prepRes)) {
+            setNestedProperty(shared, targetPath, value);
         }
         return 'default';
     }
@@ -75,12 +75,28 @@ export class AssignNode extends HAMINode<Record<string, any>, AssignNodeConfig> 
  * @param path The dot-notation path to the property (e.g., "prop.subprop").
  * @returns The value at the specified path, or undefined if the path doesn't exist.
  */
-function getNestedProperty(obj: Record<string, any>, path: string): any {
-    if (!obj || !path || typeof obj !== 'object' || typeof path !== 'string') {
-        return undefined;
-    }
+function getNestedProperty(obj: any, path: string): any {
+    if (!obj || !path) return undefined;
     const keys = path.split('.');
-    return keys.reduce((currentObj, key) =>
-        (currentObj && typeof currentObj === 'object') ? currentObj[key] : undefined
-        , obj);
+    return keys.reduce((current, key) => 
+        (current && typeof current === 'object') ? current[key] : undefined, obj);
+}
+
+/**
+ * Safely sets a nested property using dot-notation, creating intermediate objects if needed.
+ */
+function setNestedProperty(obj: any, path: string, value: any): void {
+    if (!obj || !path) return;
+    
+    const keys = path.split('.');
+    const lastKey = keys.pop()!;
+    
+    const targetObj = keys.reduce((current, key) => {
+        if (!(key in current) || current[key] === null || typeof current[key] !== 'object') {
+            current[key] = {};
+        }
+        return current[key];
+    }, obj);
+
+    targetObj[lastKey] = value;
 }
