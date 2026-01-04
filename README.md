@@ -12,12 +12,12 @@ HAMI builds on top of [PocketFlow](https://github.com/The-Pocket/PocketFlow-Type
 
 ### Core Components
 
-- **@hami-frameworx/core**: Core library providing the fundamental types, registration system, and base classes ([`core/spec.md`](openspec/specs/core/spec.md))
-- **@hami-frameworx/core-fs**: File system operations plugin ([`core-fs/spec.md`](openspec/specs/core-fs/spec.md))
-- **@hami-frameworx/core-config-fs**: Configuration management using file system storage ([`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md))
-- **@hami-frameworx/core-trace-fs**: Operation tracing and logging plugin ([`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md))
-- **@hami-frameworx/hami-cli**: Command-line interface for managing HAMI workflows ([`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md))
-- **@hami-frameworx/hami-server**: HTTP server for programmatic access to HAMI functionality ([`hami-server/spec.md`](openspec/specs/hami-server/spec.md))
+- **@hami-frameworx/core**: Core library providing the fundamental types, registration system, and base classes for the plugin architecture
+- **@hami-frameworx/core-fs**: File system operations plugin for reading, writing, copying, and listing files
+- **@hami-frameworx/core-config-fs**: Configuration management using file system storage with hierarchical local/global settings
+- **@hami-frameworx/core-trace-fs**: Operation tracing and logging plugin for workflow debugging and auditing
+- **@hami-frameworx/hami-cli**: Command-line interface for managing HAMI workflows, configurations, and traces
+- **@hami-frameworx/hami-server**: HTTP server for programmatic access to HAMI functionality via RESTful API
 
 ### Key Concepts
 
@@ -37,8 +37,9 @@ Extensible plugin architecture allowing registration of custom nodes and flows t
 ## Installation
 
 ### Prerequisites
-- Node.js 18+
-- Bun runtime (recommended)
+- Node.js 18+ (minimum version required)
+- Bun runtime (recommended for development and building)
+- TypeScript 5.x (for type checking and compilation)
 
 ### Setup
 ```bash
@@ -60,7 +61,7 @@ bun run cli:install
 
 ### CLI
 
-The HAMI CLI provides commands for managing workflows, configuration, and tracing. See [`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md) for detailed command requirements and scenarios.
+The HAMI CLI provides commands for managing workflows, configuration, and tracing.
 
 #### Initialize a HAMI project
 ```bash
@@ -113,7 +114,7 @@ hami trace grep "search query"
 
 ### Server
 
-The HAMI server provides a RESTful HTTP API for programmatic access, built with the Hono framework and structured for future API expansion. See [`hami-server/spec.md`](openspec/specs/hami-server/spec.md) for detailed API requirements and endpoint specifications.
+The HAMI server provides a RESTful HTTP API for programmatic access, built with the Hono framework and structured for future API expansion.
 
 ```bash
 # Start the development server
@@ -125,6 +126,63 @@ bun run server:dev
 - `GET /health` - Health check
 
 ## Development
+
+### Technology Stack
+- **Runtime**: Node.js 18+ (minimum), Bun (recommended for development)
+- **Language**: TypeScript 5.x with strict mode enabled
+- **Build Tool**: Bun (package manager and runtime)
+- **CLI Framework**: Commander.js (^12.0.0)
+- **HTTP Server**: Hono (^4.0.0)
+- **Workflow Engine**: PocketFlow (^1.0.4) - core execution engine
+- **Package Management**: Monorepo with npm workspaces
+- **Module System**: ES modules only (no CommonJS support)
+
+### Code Conventions
+- **Naming Conventions**:
+  - Classes: PascalCase (e.g., `HAMINode`, `HAMIFlow`)
+  - Functions/Methods: camelCase
+  - Constants: UPPER_SNAKE_CASE
+  - Files: kebab-case.ts
+  - Packages: @hami/namespace-kebab-case
+- **Formatting**: Standard TypeScript formatting
+- **Imports**: Relative imports for internal modules, absolute for external dependencies
+
+### Architecture Patterns
+- **Monorepo Structure**: Apps in `apps/`, packages in `packages/` using npm workspaces
+- **Plugin Architecture**: Extensible system using `HAMIRegistrationManager` for dynamic node and flow registration
+- **Abstract Base Classes**: `HAMINode` and `HAMIFlow` as foundations for workflow components
+- **Separation of Concerns**: Core framework separate from implementation plugins
+- **CLI + Server Pattern**: Command-line interface for direct use, HTTP server for programmatic access
+- **Workflow Composition**: Nodes connected to form flows, executed via PocketFlow engine
+
+### Testing Strategy
+Testing is currently TBD. Future implementation will include:
+- Unit tests for individual nodes and flows
+- Integration tests for plugin interactions
+- CLI command testing
+- HTTP endpoint testing for the server component
+
+### Git Workflow
+Git workflow is currently TBD. Recommended approach:
+- **Branching Strategy**: Git Flow or GitHub Flow (main for releases, feature branches for development)
+- **Commit Conventions**: Conventional commits (feat:, fix:, docs:, etc.)
+- **Pull Requests**: Required for all changes with code review
+- **Releases**: Versioned releases with changelog
+
+### Important Constraints
+- **Node.js Version**: Minimum Node.js 18+ required
+- **Runtime**: Bun recommended for development and building
+- **Module System**: ES modules only
+- **TypeScript**: Strict mode enabled with full type safety
+- **Monorepo**: Uses npm workspaces, all packages must be compatible
+- **Plugin Extensions**: Must implement `HAMINode` or `HAMIFlow` interfaces
+
+### External Dependencies
+- **PocketFlow** (^1.0.4): Core workflow execution engine for multi-agent systems and RAG patterns
+- **Commander.js** (^12.0.0): CLI framework for command parsing and help generation
+- **Hono** (^4.0.0): HTTP server framework for API endpoints
+- **TypeScript** (^5.9.3): Type system and compiler
+- **@types/node** (^20.0.0): Type definitions for Node.js runtime
 
 ### Project Structure
 ```
@@ -168,16 +226,6 @@ const MyPlugin = createPlugin(
   'My custom plugin description'
 );
 ```
-
-## Specifications
-
-For detailed technical specifications of each component, see the [`openspec/specs/`](openspec/specs/) directory:
-- [`core/spec.md`](openspec/specs/core/spec.md) - Core plugin system architecture
-- [`core-fs/spec.md`](openspec/specs/core-fs/spec.md) - File system operations
-- [`core-config-fs/spec.md`](openspec/specs/core-config-fs/spec.md) - Configuration management
-- [`core-trace-fs/spec.md`](openspec/specs/core-trace-fs/spec.md) - Trace logging and retrieval
-- [`hami-cli/spec.md`](openspec/specs/hami-cli/spec.md) - Command-line interface
-- [`hami-server/spec.md`](openspec/specs/hami-server/spec.md) - HTTP API server
 
 ## Contributing
 
