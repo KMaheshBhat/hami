@@ -38,11 +38,12 @@ export class ConfigListFlow extends HAMIFlow<Record<string, any>, ConfigListFlow
 
     async run(shared: Record<string, any>): Promise<string | undefined> {
         assert(shared.registry, 'registry is required');
-        const validate = shared['registry'].createNode("core-fs:validate-hami", {});
+        const n = shared.registry.createNode.bind(shared.registry);
+        const validate = n("core-fs:validate-hami", {});
         validate
-            .on('error', shared['registry'].createNode('core:log-error', { errorKey: 'directoryValidationErrors' }));
-        const getAllConfig = shared['registry'].createNode("core-config-fs:get-all", {});
-        const logConfig = shared['registry'].createNode("core:log-result", {
+            .on('error', n('core:log-error', { errorKey: 'directoryValidationErrors' }));
+        const getAllConfig = n("core-config-fs:get-all", {});
+        const logConfig = n("core:log-result", {
             resultKey: "configValues",
             format: "table",
             prefix: "Configuration entries:",
