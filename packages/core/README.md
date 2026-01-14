@@ -42,6 +42,8 @@ This package provides the following core node types:
 - **`core:assign`**: Assigns properties from shared state using dot-notation paths
 - **`core:dynamic-runner`**: Dynamically creates and runs nodes based on configuration
 - **`core:dynamic-runner-flow`**: Flow wrapper for dynamic node execution
+- **`core:mutate`**: Executes a user-provided function to mutate the shared state
+- **`core:branch`**: Executes a user-provided function to determine the next branch in the workflow
 
 ## Basic Usage
 

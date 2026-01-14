@@ -1,6 +1,6 @@
 {
   "name": "@hami-frameworx/core-config-fs",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Core File System based Configuration library for HAMI",
   "license": "MIT",
   "type": "module",

@@ -8,7 +8,7 @@
  */
 
 import { createPlugin } from "./registration.js";
-import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, AssignNode, DebugNode, MutateNode } from "./ops/index.js";
+import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, AssignNode, DebugNode, MutateNode, BranchNode } from "./ops/index.js";
 
 /**
  * The HAMI Core Plugin instance.
@@ -21,6 +21,7 @@ import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, Assi
  * - `AssignNode` ('core:assign'): Assigns and transforms properties in shared state using dot-notation paths
  * - `DebugNode` ('core:debug'): Logs the entire shared state for debugging purposes
  * - `MutateNode` ('core:mutate'): Executes a user-provided function to mutate the shared state
+ * - `BranchNode` ('core:branch'): Executes a user-provided function to determine the next branch in the workflow
  *
  * To use this plugin, register it with a HAMIRegistrationManager:
  * ```typescript
@@ -41,6 +42,7 @@ const CorePlugin = createPlugin(
         AssignNode as any,
         DebugNode as any,
         MutateNode as any,
+        BranchNode as any,
     ],
     "HAMI Core Plugin - Fundamental nodes for logging and dynamic execution",
 );
