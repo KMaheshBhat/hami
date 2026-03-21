@@ -1,6 +1,6 @@
 {
   "name": "@hami-frameworx/hami-server",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "HAMI HTTP server application",
   "license": "MIT",
   "type": "module",
