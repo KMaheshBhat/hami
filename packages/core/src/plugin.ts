@@ -9,6 +9,7 @@
 
 import { createPlugin } from "./registration.js";
 import { LogResultNode, LogErrorNode, DynamicRunnerNode, DynamicRunnerFlow, AssignNode, DebugNode, MutateNode, BranchNode } from "./ops/index.js";
+import { HAMIFlow, HAMINode } from "./types.js";
 
 /**
  * The HAMI Core Plugin instance.
@@ -35,15 +36,15 @@ const CorePlugin = createPlugin(
     "@hami/core",
     "1.0.0",
     [
-        LogResultNode as any,
-        LogErrorNode as any,
-        DynamicRunnerNode as any,
-        DynamicRunnerFlow as any,
-        AssignNode as any,
-        DebugNode as any,
-        MutateNode as any,
-        BranchNode as any,
-    ],
+        LogResultNode,
+        LogErrorNode,
+        DynamicRunnerNode,
+        DynamicRunnerFlow,
+        AssignNode,
+        DebugNode,
+        MutateNode,
+        BranchNode,
+    ] as (typeof HAMINode | typeof HAMIFlow)[],
     "HAMI Core Plugin - Fundamental nodes for logging and dynamic execution",
 );
 

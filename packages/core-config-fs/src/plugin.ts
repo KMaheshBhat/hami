@@ -1,4 +1,4 @@
-import { createPlugin } from "@hami-frameworx/core";
+import { createPlugin, HAMINode, HAMIFlow } from "@hami-frameworx/core";
 
 import { CoreConfigFSGetNode, CoreConfigFSGetAllNode, CoreConfigFSSetNode, CoreConfigFSRemoveNode } from "./ops/index.js";
 
@@ -17,11 +17,11 @@ const CoreConfigFSPlugin = createPlugin(
     "core-config-fs",
     "0.1.0",
     [
-        CoreConfigFSGetNode as any,
-        CoreConfigFSGetAllNode as any,
-        CoreConfigFSSetNode as any,
-        CoreConfigFSRemoveNode as any,
-    ],
+        CoreConfigFSGetNode,
+        CoreConfigFSGetAllNode,
+        CoreConfigFSSetNode,
+        CoreConfigFSRemoveNode,
+    ] as (typeof HAMINode | typeof HAMIFlow)[],
     "HAMI Core Configuration File System Plugin",
 );
 

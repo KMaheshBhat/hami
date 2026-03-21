@@ -1,4 +1,4 @@
-import { createPlugin } from "@hami-frameworx/core";
+import { createPlugin, HAMINode, HAMIFlow } from "@hami-frameworx/core";
 
 import { CoreFSCopyNode, CoreFSListDirectoryNode, CoreFSReadFileNode, CoreFSWriteFileNode, InitWorkingDirectoryNode, ValidateNode } from "./ops/index.js";
 
@@ -19,13 +19,13 @@ const CoreFSPlugin = createPlugin(
     "core-fs",
     "0.1.0",
     [
-        InitWorkingDirectoryNode as any,
-        ValidateNode as any,
-        CoreFSCopyNode as any,
-        CoreFSListDirectoryNode as any,
-        CoreFSReadFileNode as any,
-        CoreFSWriteFileNode as any,
-    ],
+        InitWorkingDirectoryNode,
+        ValidateNode,
+        CoreFSCopyNode,
+        CoreFSListDirectoryNode,
+        CoreFSReadFileNode,
+        CoreFSWriteFileNode,
+    ] as (typeof HAMINode | typeof HAMIFlow)[],
     "HAMI Core File System Plugin",
 );
 
