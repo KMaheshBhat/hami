@@ -1,11 +1,14 @@
 {
   "name": "@hami-frameworx/core",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "description": "Core library for HAMI",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "bunx tsc",
     "dev": "bun run build"

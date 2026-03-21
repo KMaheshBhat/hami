@@ -1,6 +1,6 @@
 {
   "name": "@hami-frameworx/hami-cli",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "description": "HAMI CLI application",
   "license": "MIT",
   "type": "module",
@@ -8,6 +8,9 @@
   "bin": {
     "hami": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "bunx tsc",
     "dev": "bun run build && bun run dist/index.js",
@@ -16,10 +19,10 @@
   "dependencies": {
     "commander": "^12.0.0",
     "pocketflow": "^1.0.4",
-    "@hami-frameworx/core": "workspace:*",
-    "@hami-frameworx/core-fs": "workspace:*",
-    "@hami-frameworx/core-config-fs": "workspace:*",
-    "@hami-frameworx/core-trace-fs": "workspace:*"
+    "@hami-frameworx/core": "0.1.8",
+    "@hami-frameworx/core-fs": "0.1.8",
+    "@hami-frameworx/core-config-fs": "0.1.8",
+    "@hami-frameworx/core-trace-fs": "0.1.8"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

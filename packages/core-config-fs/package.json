@@ -1,11 +1,14 @@
 {
   "name": "@hami-frameworx/core-config-fs",
-  "version": "0.1.5",
+  "version": "0.1.8",
   "description": "Core File System based Configuration library for HAMI",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "bunx tsc",
     "dev": "bun run build"
@@ -15,6 +18,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@hami-frameworx/core": "workspace:*"
+    "@hami-frameworx/core": "0.1.8"
   }
 }
