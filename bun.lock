@@ -5,9 +5,9 @@
     "": {
       "name": "hami-monorepo",
       "devDependencies": {
-        "@types/bun": "^1.3.11",
-        "shx": "^0.4.0",
-        "typescript": "^5.9.3",
+        "@types/bun": "latest",
+        "shx": "latest",
+        "typescript": "latest",
       },
       "peerDependencies": {
         "typescript": "^5",
@@ -15,7 +15,7 @@
     },
     "apps/hami-cli": {
       "name": "@hami-frameworx/hami-cli",
-      "version": "0.1.9",
+      "version": "0.1.8",
       "bin": {
         "hami": "dist/index.js",
       },
@@ -46,7 +46,7 @@
     },
     "packages/core": {
       "name": "@hami-frameworx/core",
-      "version": "0.1.9",
+      "version": "0.1.8",
       "dependencies": {
         "pocketflow": "^1.0.4",
       },
@@ -57,7 +57,7 @@
     },
     "packages/core-config-fs": {
       "name": "@hami-frameworx/core-config-fs",
-      "version": "0.1.9",
+      "version": "0.1.8",
       "dependencies": {
         "@hami-frameworx/core": "0.1.8",
       },
@@ -68,7 +68,7 @@
     },
     "packages/core-fs": {
       "name": "@hami-frameworx/core-fs",
-      "version": "0.1.9",
+      "version": "0.1.8",
       "dependencies": {
         "@hami-frameworx/core": "0.1.8",
         "glob": "^11.0.3",
@@ -81,7 +81,7 @@
     },
     "packages/core-trace-fs": {
       "name": "@hami-frameworx/core-trace-fs",
-      "version": "0.1.9",
+      "version": "0.1.8",
       "dependencies": {
         "@hami-frameworx/core": "0.1.8",
         "uuidv7": "^1.0.2",
