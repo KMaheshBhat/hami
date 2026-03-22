@@ -162,6 +162,37 @@ export abstract class HAMIFlow<S = unknown, C = unknown> extends Flow<S> {
     /** Protected configuration instance, validated during construction */
     protected config: C | undefined = undefined;
 
+    constructor(config: C);
+
+    constructor(start: BaseNode, config: C);
+
+    constructor(startOrConfig: BaseNode | C, config?: C) {
+        // Handle both cases
+        if (config === undefined) {
+            // Only config provided - create default start node
+            const start = HAMIFlow.createStartNode(startOrConfig as C);
+            super(start);
+            this.config = startOrConfig as C;
+        } else {
+            // Both provided
+            super(startOrConfig as BaseNode);
+            this.config = config;
+        }
+
+        if (this.config) {
+            const validation = this.validateConfig(this.config);
+            if (!validation.valid) {
+                throw new Error(`Invalid configuration for HAMIFlow ${this.kind()}`, {
+                    cause: validation.errors,
+                });
+            }
+        }
+    }
+
+    static createStartNode<C>(config: C): BaseNode {
+        return new Node(); // Default implementation
+    }
+
     /**
      * Constructs a new HAMIFlow instance.
      *
@@ -172,6 +203,7 @@ export abstract class HAMIFlow<S = unknown, C = unknown> extends Flow<S> {
      * @param config Configuration object for the flow
      * @throws Error if configuration validation fails
      */
+    /*
     constructor(start: BaseNode, config: C) {
         super(start);
         this.config = config;
@@ -183,6 +215,8 @@ export abstract class HAMIFlow<S = unknown, C = unknown> extends Flow<S> {
             });
         }
     }
+    */
+
     /**
      * Returns the unique kind identifier for this flow type.
      *
