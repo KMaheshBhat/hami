@@ -1,35 +1,11 @@
 {
-  "name": "hami-frameworx-monorepo",
-  "version": "0.1.0",
-  "description": "Monorepo for HAMI FRAMEWORX",
-  "license": "MIT",
+  "name": "@hami-frameworx/workspace",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "core:build": "bun run --filter='@hami-frameworx/core' build",
-    "core-config-fs:build": "bun run --filter='@hami-frameworx/core-config-fs' build",
-    "core-fs:build": "bun run --filter='@hami-frameworx/core-fs' build",
-    "core-trace-fs:build": "bun run --filter='@hami-frameworx/core-trace-fs' build",
-    "hami-cli:build": "bun run --filter='@hami-frameworx/hami-cli' build",
-    "cli:dev": "bun run --cwd apps/hami-cli dev",
-    "cli:install": "bun run --cwd apps/hami-cli build && cd apps/hami-cli && bun link",
-    "server:dev": "bun run --cwd apps/hami-server dev",
-    "all:build": "bun run scripts/build-all.ts",
-    "all:build-fresh": "bun run scripts/build-all.ts --clean",
-    "all:build-dist": "bun run scripts/build-all.ts --clean --dist",
-    "all:clean": "rm -rf apps/*/dist packages/*/dist",
-    "node_modules:clean": "shx rm -rf node_modules apps/*/node_modules packages/*/node_modules"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.3.11",
-    "shx": "^0.4.0",
-    "typescript": "^5.9.3"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "type": "module"
+    "cli": "bun run apps/hami-cli/src/index.ts"
+  }
 }

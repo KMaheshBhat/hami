@@ -1,23 +1,5 @@
 {
   "name": "@hami-frameworx/core",
-  "version": "0.1.10",
-  "description": "Core library for HAMI",
-  "license": "MIT",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "bunx tsc",
-    "dev": "bun run build"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "pocketflow": "^1.0.4"
-  }
+  "version": "0.2.0-dev",
+  "module": "./src/index.ts"
 }
