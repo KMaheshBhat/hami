@@ -1,5 +1,5 @@
 {
-  "name": "@hami-frameworx/core",
+  "name": "@hami-frameworx/runtime",
   "version": "0.2.0-dev",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,6 +10,10 @@
     }
   },
   "files": ["dist"],
+  "dependencies": {
+    "@types/node": "^26.0.0",
+    "@hami-frameworx/core": "workspace:*"
+  },
   "scripts": {
     "build": "bun build:types && bun build:src",
     "build:src": "bun build src/index.ts --outdir dist",

@@ -2,8 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
     "strict": true,
+    "types": ["node"],
     "paths": {
       "@hami-frameworx/*": ["./packages/*/src"],
     },

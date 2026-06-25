@@ -6,6 +6,14 @@
     "apps/*"
   ],
   "scripts": {
-    "cli": "bun run apps/hami-cli/src/index.ts"
+    "cli": "bun run apps/hami-cli/src/index.ts",
+    "build": "bun run build:core && bun run build:runtime",
+    "build:core": "cd packages/core && bun run build",
+    "build:runtime": "cd packages/runtime && bun run build"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^26.0.0",
+    "typescript": "^5.9.3"
   }
 }
